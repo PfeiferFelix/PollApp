@@ -1,1 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
+
+@font-face {
+  font-family: 'Nerko One';
+  src: url('/fonts/NerkoOne-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --page-bg: #34273B;
+  --content-max-width: 1440px;
+}
+
+body {
+  margin: 0;
+  background-color: var(--page-bg);
+}
+
+app-root {
+  display: block;
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+}

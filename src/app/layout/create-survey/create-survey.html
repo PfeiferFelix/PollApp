@@ -1,0 +1,58 @@
+<section class="main">
+  <div class="survey_card">
+    <div class="card_header">
+      <img class="status_badge" src="images/survey_Status/draft.png" alt="Draft" />
+
+      <h1>Create new survey</h1>
+
+      <a class="cancel_btn" routerLink="/home" aria-label="Cancel">
+        <img src="images/Secpondary button.png" alt="">
+      </a>
+    </div>
+
+    <section class="inputs">
+      <div class="inputs__grid">
+
+        <div class="inputs__column">
+          <div class="field">
+            <label class="field_label" for="survey_name">Survey name</label>
+            <div class="field_row">
+              <input class="field_input" id="survey_name" type="text">
+              <button class="field_clear" type="button" aria-label="Clear survey name"></button>
+            </div>
+          </div>
+
+          <div class="field_line">
+            <div class="field field--date">
+              <label class="field_label" for="survey_end_date">
+                Set end date <span class="field_hint">(optional)</span>
+              </label>
+              <div class="field_row">
+                <input class="field_input" id="survey_end_date" type="text">
+                <button class="field_clear" type="button" aria-label="Clear end date"></button>
+              </div>
+            </div>
+
+            <button class="category_btn" type="button" aria-haspopup="menu" aria-expanded="false">
+              Choose category
+              <span class="category_btn_arrow" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="field field--description">
+          <label class="field_label" for="survey_description">
+            Describing text <span class="field_hint">(optional)</span>
+          </label>
+          <div class="field_row field_row--top">
+            <textarea class="field_input field_input--area" id="survey_description" rows="4"></textarea>
+            <button class="field_clear" type="button" aria-label="Clear describing text"></button>
+          </div>
+        </div>
+
+        
+
+      </div>
+    </section>
+  </div>
+</section>
