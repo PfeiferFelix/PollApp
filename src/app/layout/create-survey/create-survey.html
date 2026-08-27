@@ -50,9 +50,48 @@
           </div>
         </div>
 
-        
+        <div class="question">
+          <div class="question__head">
+            <label class="field_label" for="question_1">1. Question</label>
+            <button class="field_clear" type="button" aria-label="Delete question 1"></button>
+          </div>
+
+          <div class="field_row">
+            <input class="field_input" id="question_1" type="text"
+                   placeholder="Which date would work best for you?">
+          </div>
+
+          <div class="answers">
+            <div class="answers__head">
+              <span class="field_label">Answers</span>
+
+              <label class="checkbox">
+                <input class="checkbox__input" type="checkbox">
+                <span class="checkbox__box" aria-hidden="true"></span>
+                <span class="checkbox__text">Allow multiple answers.</span>
+              </label>
+            </div>
+
+            <div class="answer">
+              <span class="answer__letter" aria-hidden="true">A.</span>
+              <input class="field_input" type="text" aria-label="Answer A">
+              <button class="field_clear" type="button" aria-label="Delete answer A"></button>
+            </div>
+
+            <div class="answer">
+              <span class="answer__letter" aria-hidden="true">B.</span>
+              <input class="field_input" type="text" aria-label="Answer B">
+              <button class="field_clear" type="button" aria-label="Delete answer B"></button>
+            </div>
+
+            <button class="add_answer_btn" type="button" aria-label="Add answer"></button>
+          </div>
+        </div>
+
+        <button class="add_question_btn" type="button" aria-label="Add next question"></button>
 
       </div>
     </section>
+    <button class="publish"></button>
   </div>
 </section>
