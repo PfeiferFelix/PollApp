@@ -6,18 +6,23 @@
       <h1>Create new survey</h1>
 
       <a class="cancel_btn" routerLink="/home" aria-label="Cancel">
-        <img src="images/Secpondary button.png" alt="">
+        <img src="images/Secpondary button.png" alt="" />
       </a>
     </div>
 
     <section class="inputs">
       <div class="inputs__grid">
-
         <div class="inputs__column">
           <div class="field">
             <label class="field_label" for="survey_name">Survey name</label>
             <div class="field_row">
-              <input class="field_input" id="survey_name" type="text">
+              <input
+                class="field_input"
+                id="survey_name"
+                type="text"
+                [value]="title()"
+                (input)="title.set(readValue($event))"
+              />
               <button class="field_clear" type="button" aria-label="Clear survey name"></button>
             </div>
           </div>
@@ -28,15 +33,56 @@
                 Set end date <span class="field_hint">(optional)</span>
               </label>
               <div class="field_row">
-                <input class="field_input" id="survey_end_date" type="text">
-                <button class="field_clear" type="button" aria-label="Clear end date"></button>
+                <input
+                  class="field_input"
+                  id="survey_end_date"
+                  type="date"
+                  [value]="endDate()"
+                  (input)="onEndDateInput($event)"
+                />
+                @if (endDate()) {
+                  <button
+                    (click)="deleteEndDateInput()"
+                    class="field_clear"
+                    type="button"
+                    aria-label="Clear end date"
+                  ></button>
+                }
               </div>
             </div>
 
-            <button class="category_btn" type="button" aria-haspopup="menu" aria-expanded="false">
-              Choose category
-              <span class="category_btn_arrow" aria-hidden="true"></span>
-            </button>
+            <div class="dropdown">
+              <button
+                class="category_btn"
+                type="button"
+                aria-haspopup="menu"
+                [attr.aria-expanded]="categoryOpen()"
+                (click)="toggleCategory()"
+              >
+                {{ category() ?? 'Choose category' }}
+                <span class="category_btn_arrow" aria-hidden="true"></span>
+              </button>
+
+              @if (categoryOpen()) {
+                <ul class="dropdown_list" role="menu" aria-label="Categories">
+                  @for (cat of categories; track cat) {
+                    <li>
+                      <button
+                        type="button"
+                        role="menuitemradio"
+                        class="dropdown_item"
+                        [class.is_selected]="category() === cat"
+                        [attr.aria-checked]="category() === cat"
+                        (click)="selectCategory(cat)"
+                      >
+                        {{ cat }}
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+
           </div>
         </div>
 
@@ -45,7 +91,13 @@
             Describing text <span class="field_hint">(optional)</span>
           </label>
           <div class="field_row field_row--top">
-            <textarea class="field_input field_input--area" id="survey_description" rows="4"></textarea>
+            <textarea
+              class="field_input field_input--area"
+              id="survey_description"
+              rows="4"
+              [value]="description()"
+              (input)="description.set(readValue($event))"
+            ></textarea>
             <button class="field_clear" type="button" aria-label="Clear describing text"></button>
           </div>
         </div>
@@ -57,8 +109,14 @@
           </div>
 
           <div class="field_row">
-            <input class="field_input" id="question_1" type="text"
-                   placeholder="Which date would work best for you?">
+            <input
+              class="field_input"
+              id="question_1"
+              type="text"
+              placeholder="Which date would work best for you?"
+              [value]="questionText()"
+              (input)="questionText.set(readValue($event))"
+            />
           </div>
 
           <div class="answers">
@@ -66,32 +124,58 @@
               <span class="field_label">Answers</span>
 
               <label class="checkbox">
-                <input class="checkbox__input" type="checkbox">
+                <input allowMultiple="signal(false);" class="checkbox__input" type="checkbox" />
                 <span class="checkbox__box" aria-hidden="true"></span>
                 <span class="checkbox__text">Allow multiple answers.</span>
               </label>
             </div>
 
-            <div class="answer">
-              <span class="answer__letter" aria-hidden="true">A.</span>
-              <input class="field_input" type="text" aria-label="Answer A">
-              <button class="field_clear" type="button" aria-label="Delete answer A"></button>
-            </div>
+            @for (answer of answers(); track answer.id) {
+              <div class="answer">
+                <span class="answer__letter" aria-hidden="true">{{ letters[$index] }}.</span>
+                <input
+                  class="field_input"
+                  type="text"
+                  [value]="answer.text"
+                  (input)="onAnswerInput(answer.id, $event)"
+                  [attr.aria-label]="'Answer ' + letters[$index]"
+                />
+                <button
+                  (click)="removeAnswer(answer.id)"
+                  class="field_clear"
+                  type="button"
+                  [attr.aria-label]="'Delete answer ' + letters[$index]"
+                ></button>
+              </div>
+            }
 
-            <div class="answer">
-              <span class="answer__letter" aria-hidden="true">B.</span>
-              <input class="field_input" type="text" aria-label="Answer B">
-              <button class="field_clear" type="button" aria-label="Delete answer B"></button>
-            </div>
-
-            <button class="add_answer_btn" type="button" aria-label="Add answer"></button>
+            @if (answers().length < letters.length) {
+              <button
+                class="add_answer_btn"
+                type="button"
+                aria-label="Add answer"
+                (click)="addAnswer()"
+              ></button>
+            }
           </div>
         </div>
 
         <button class="add_question_btn" type="button" aria-label="Add next question"></button>
-
       </div>
     </section>
-    <button class="publish"></button>
+
+    @if (formError()) {
+      <p class="form_error">{{ formError() }}</p>
+    }
+    @if (surveys.errorMessage()) {
+      <p class="form_error">{{ surveys.errorMessage() }}</p>
+    }
+
+    <button
+      class="publish"
+      type="button"
+      [disabled]="surveys.isLoading()"
+      (click)="publish()"
+    ></button>
   </div>
 </section>

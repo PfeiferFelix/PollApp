@@ -2,7 +2,7 @@
 export interface Question {
   id: number;
   survey_id: number;
-  question_text: string;
+  questions_text: string;
   allow_multiple: boolean;
   options: string[];
 }
@@ -14,6 +14,16 @@ export interface Survey {
   ends_at: string;
   category: string;
   questions: Question[];
+}
+
+export interface NewSurvey {
+  title: string;
+  description: string;
+  ends_at: string;
+  category: string;
+  questions_text: string;
+  allow_multiple: boolean;
+  options: string[];
 }
 
 import { Injectable } from '@angular/core';

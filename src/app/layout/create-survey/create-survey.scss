@@ -6,8 +6,7 @@
     padding: 40px;
     background-color: #FFFFFF;
 
-    // app-root ist auf 1440px begrenzt - der Schatten zieht das Weiss
-    // ueber die Seitenraender hinaus bis zum Fensterrand.
+
     box-shadow: 0 0 0 100vmax #FFFFFF;
     clip-path: inset(0 -100vmax);
 }
@@ -174,6 +173,11 @@
 
     .field--date{
         flex: 0 1 260px;
+
+     
+        .field_label{
+            white-space: nowrap;
+        }
     }
 }
 
@@ -211,6 +215,52 @@
     &[aria-expanded='true'] .category_btn_arrow{
         margin-top: 5px;
         transform: rotate(-135deg);
+    }
+}
+
+
+.dropdown{
+    position: relative;
+    flex: 0 0 auto;
+
+    .dropdown_list{
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        z-index: 20;
+        min-width: 190px;
+        margin: 0;
+        padding: 6px;
+        list-style: none;
+        border-radius: 12px;
+        background-color: #3B2E45;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .dropdown_item{
+        display: block;
+        width: 100%;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: none;
+        cursor: pointer;
+        text-align: left;
+        font-family: inherit;
+        font-size: 14px;
+        line-height: 1.2;
+        color: #FFFFFF;
+        transition: background-color 0.2s ease, color 0.2s ease;
+
+        &:hover,
+        &:focus-visible{
+            background-color: #47374F;
+        }
+
+        &.is_selected{
+            color: #34273B;
+            background-color: #FFB770;
+        }
     }
 }
 
@@ -356,6 +406,15 @@
     }
 }
 
+.form_error{
+    margin: 24px 0 0;
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.3;
+    color: #FFB770;
+    text-align: right;
+}
+
 .publish{
     display: block;
     margin: 32px 0 0 auto;
@@ -375,5 +434,13 @@
 
     &:active{
         transform: scale(0.97);
+    }
+
+
+    &:disabled{
+        cursor: default;
+        opacity: 0.5;
+        transform: none;
+        filter: none;
     }
 }
