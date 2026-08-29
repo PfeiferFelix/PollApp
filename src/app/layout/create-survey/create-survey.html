@@ -101,66 +101,82 @@
             <button class="field_clear" type="button" aria-label="Clear describing text"></button>
           </div>
         </div>
-
-        <div class="question">
-          <div class="question__head">
-            <label class="field_label" for="question_1">1. Question</label>
-            <button class="field_clear" type="button" aria-label="Delete question 1"></button>
-          </div>
-
-          <div class="field_row">
-            <input
-              class="field_input"
-              id="question_1"
-              type="text"
-              placeholder="Which date would work best for you?"
-              [value]="questionText()"
-              (input)="questionText.set(readValue($event))"
-            />
-          </div>
-
-          <div class="answers">
-            <div class="answers__head">
-              <span class="field_label">Answers</span>
-
-              <label class="checkbox">
-                <input allowMultiple="signal(false);" class="checkbox__input" type="checkbox" />
-                <span class="checkbox__box" aria-hidden="true"></span>
-                <span class="checkbox__text">Allow multiple answers.</span>
-              </label>
+        @for (question of questions(); track question.id; let qi = $index) {
+          <div class="question">
+            <div class="question__head">
+              <label class="field_label" [attr.for]="'question_' + qi">{{ qi + 1 }}. Question</label>
+              <button (click)="removeQuestion(question.id)"
+                class="field_clear"
+                type="button"
+                [attr.aria-label]="'Delete question ' + (qi + 1)"
+              ></button>
             </div>
 
-            @for (answer of answers(); track answer.id) {
-              <div class="answer">
-                <span class="answer__letter" aria-hidden="true">{{ letters[$index] }}.</span>
-                <input
-                  class="field_input"
-                  type="text"
-                  [value]="answer.text"
-                  (input)="onAnswerInput(answer.id, $event)"
-                  [attr.aria-label]="'Answer ' + letters[$index]"
-                />
-                <button
-                  (click)="removeAnswer(answer.id)"
-                  class="field_clear"
-                  type="button"
-                  [attr.aria-label]="'Delete answer ' + letters[$index]"
-                ></button>
+            <div class="field_row">
+              <input
+                class="field_input"
+                [attr.id]="'question_' + qi"
+                type="text"
+                placeholder="Which date would work best for you?"
+                [value]="question.text()"
+                (input)="question.text.set(readValue($event))"
+              />
+            </div>
+
+            <div class="answers">
+              <div class="answers__head">
+                <span class="field_label">Answers</span>
+
+                <label class="checkbox">
+                  <input
+                    class="checkbox__input"
+                    type="checkbox"
+                    [checked]="question.allowMultiple()"
+                    (change)="question.allowMultiple.set(readChecked($event))"
+                  />
+                  <span class="checkbox__box" aria-hidden="true"></span>
+                  <span class="checkbox__text">Allow multiple answers.</span>
+                </label>
               </div>
-            }
 
-            @if (answers().length < letters.length) {
-              <button
-                class="add_answer_btn"
-                type="button"
-                aria-label="Add answer"
-                (click)="addAnswer()"
-              ></button>
-            }
+              @for (answer of question.answers(); track answer.id) {
+                <div class="answer">
+                  <span class="answer__letter" aria-hidden="true">{{ letters[$index] }}.</span>
+                  <input
+                    class="field_input"
+                    type="text"
+                    [value]="answer.text"
+                    (input)="onAnswerInput(question, answer.id, $event)"
+                    [attr.aria-label]="'Answer ' + letters[$index]"
+                  />
+                  <button
+                    (click)="removeAnswer(question, answer.id)"
+                    class="field_clear"
+                    type="button"
+                    [attr.aria-label]="'Delete answer ' + letters[$index]"
+                  ></button>
+                </div>
+              }
+
+              @if (question.answers().length < letters.length) {
+                <button
+                  class="add_answer_btn"
+                  type="button"
+                  aria-label="Add answer"
+                  (click)="addAnswer(question)"
+                ></button>
+              }
+            </div>
           </div>
-        </div>
-
-        <button class="add_question_btn" type="button" aria-label="Add next question"></button>
+        }
+        @if (questions().length < maxQuestions) {
+          <button
+            (click)="addQuestion()"
+            class="add_question_btn"
+            type="button"
+            aria-label="Add next question"
+          ></button>
+        }
       </div>
     </section>
 

@@ -1,7 +1,16 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, WritableSignal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Surveys } from '../../services/surveys';
 import { NewSurvey } from '../../services/service';
+
+interface Question {
+  id: number;
+  text: WritableSignal<string>;
+  allowMultiple: WritableSignal<boolean>;
+  answers: WritableSignal<{ id: number; text: string }[]>;
+}
+
+
 
 /**
  * Formular zum Anlegen einer neuen Umfrage samt Frage und Antworten.
@@ -20,14 +29,8 @@ export class CreateSurvey {
   /** Hinweis, welche Angabe im Formular noch fehlt. Null wenn alles passt. */
   formError = signal<string | null>(null);
 
-  /**
-   * Die Antwortfelder. Jedes hat ein Namensschild (id) und seinen Inhalt (text).
-   * Der Buchstabe kommt aus der Position in der Liste, nicht aus den Daten.
-   */
-  answers = signal([
-    { id: 1, text: '' },
-    { id: 2, text: '' },
-  ]);
+  maxQuestions = 4;
+  nextQuestionId = 2;
 
   /** Buchstaben der Antwortfelder. Die Laenge legt zugleich die Obergrenze fest. */
   letters = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -44,23 +47,25 @@ export class CreateSurvey {
   /** Ob das Kategorie-Menue gerade offen ist. */
   categoryOpen = signal(false);
 
-  /** Unter zwei Antworten ist es keine Umfrage mehr. */
+  /** minimal zwei antworten pro frage*/
   minAnswers = 2;
+
+  /**minimal eine question*/
+minQuestions = 1;
+
 
   /** 1 und 2 sind schon vergeben, die naechste neue Antwort bekommt die 3. */
   nextAnswerId = 3;
 
-  /** Name der Umfrage. */
-  title = signal('');
-
   /** Optionaler Beschreibungstext. */
   description = signal('');
 
-  /** Text der Frage. */
-  questionText = signal('');
 
-  /** Ob mehrere Antworten gleichzeitig gewaehlt werden duerfen. */
-  allowMultiple = signal(false);
+  /** Name der Umfrage. */
+  title = signal('');
+
+
+
 
   /** Oeffnet das Kategorie-Menue, oder schliesst es wenn es offen war. */
   toggleCategory(): void {
@@ -76,29 +81,62 @@ export class CreateSurvey {
     this.categoryOpen.set(false);
   }
 
-  /** Haengt ein leeres Antwortfeld an, solange die Obergrenze nicht erreicht ist. */
-  addAnswer(): void {
-    if (this.answers().length >= this.letters.length) return;
-    this.answers.update((list) => [...list, { id: this.nextAnswerId++, text: '' }]);
+  createQuestion(): Question {
+    return {
+      id: this.nextQuestionId++,
+      text: signal(''),
+      allowMultiple: signal(false),
+      answers: signal([
+        { id: this.nextAnswerId++, text: '' },
+        { id: this.nextAnswerId++, text: '' },
+      ]),
+    };
+  }
+  questions = signal<Question[]>([this.createQuestion()]);
+
+  /** Haengt eine neue Frage an, solange die Obergrenze nicht erreicht ist. */
+  addQuestion(): void {
+    if (this.questions().length >= this.maxQuestions) return;
+    this.questions.update((list) => [...list, this.createQuestion()]);
+  }
+
+  /**
+   * Entfernt eine Frage, solange danach noch eine uebrig bleibt.
+   * @param id Namensschild der zu entfernenden Frage.
+   */
+  removeQuestion(id: number): void {
+    if (this.questions().length <= this.minQuestions) return;
+    this.questions.update((list) => list.filter((question) => question.id !== id));
+  }
+
+  /**
+   * Haengt ein leeres Antwortfeld an, solange die Obergrenze nicht erreicht ist.
+   * @param question Die Frage, zu der die Antwort gehoert.
+   */
+  addAnswer(question: Question): void {
+    if (question.answers().length >= this.letters.length) return;
+    question.answers.update((list) => [...list, { id: this.nextAnswerId++, text: '' }]);
   }
 
   /**
    * Entfernt ein Antwortfeld, solange danach noch genug uebrig bleiben.
+   * @param question Die Frage, zu der die Antwort gehoert.
    * @param id Namensschild der zu entfernenden Antwort.
    */
-  removeAnswer(id: number): void {
-    if (this.answers().length <= this.minAnswers) return;
-    this.answers.update((list) => list.filter((answer) => answer.id !== id));
+  removeAnswer(question: Question, id: number): void {
+    if (question.answers().length <= this.minAnswers) return;
+    question.answers.update((list) => list.filter((answer) => answer.id !== id));
   }
 
   /**
    * Uebernimmt den getippten Text in das passende Antwortfeld.
+   * @param question Die Frage, zu der die Antwort gehoert.
    * @param id Namensschild der bearbeiteten Antwort.
    * @param event Das Eingabe-Ereignis des Feldes.
    */
-  onAnswerInput(id: number, event: Event): void {
+  onAnswerInput(question: Question, id: number, event: Event): void {
     const text = (event.target as HTMLInputElement).value;
-    this.answers.update((list) =>
+    question.answers.update((list) =>
       list.map((answer) => (answer.id === id ? { ...answer, text } : answer)),
     );
   }
@@ -153,11 +191,20 @@ export class CreateSurvey {
   }
 
   /**
-   * Sammelt die ausgefuellten Antworten ein.
+   * Die erste Frage. Nur sie wird derzeit gespeichert.
+   * @returns Die erste Frage der Liste.
+   */
+  firstQuestion(): Question {
+    return this.questions()[0];
+  }
+
+  /**
+   * Sammelt die ausgefuellten Antworten der ersten Frage ein.
    * @returns Die Antworttexte ohne Leerzeichen am Rand, leere ausgelassen.
    */
   filledOptions(): string[] {
-    return this.answers()
+    return this.firstQuestion()
+      .answers()
       .map((answer) => answer.text.trim())
       .filter((text) => text.length > 0);
   }
@@ -171,7 +218,7 @@ export class CreateSurvey {
     if (!this.title().trim()) return 'Bitte gib der Umfrage einen Namen.';
     if (!this.category()) return 'Bitte waehle eine Kategorie.';
     if (!this.endDate()) return 'Bitte waehle ein Enddatum.';
-    if (!this.questionText().trim()) return 'Bitte formuliere eine Frage.';
+    if (!this.firstQuestion().text().trim()) return 'Bitte formuliere eine Frage.';
     if (options.length < this.minAnswers) return 'Bitte fuelle zwei Antworten aus.';
     return null;
   }
@@ -182,13 +229,14 @@ export class CreateSurvey {
    * @returns Die vollstaendigen Daten der neuen Umfrage.
    */
   buildSurvey(options: string[]): NewSurvey {
+    const question = this.firstQuestion();
     return {
       title: this.title().trim(),
       description: this.description().trim(),
       ends_at: this.endDate(),
       category: this.category()!,
-      questions_text: this.questionText().trim(),
-      allow_multiple: this.allowMultiple(),
+      questions_text: question.text().trim(),
+      allow_multiple: question.allowMultiple(),
       options,
     };
   }
