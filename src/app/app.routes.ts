@@ -7,6 +7,6 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: Home, title: 'PollApp' },
   { path: 'create', component: CreateSurvey, title: 'Neue Umfrage' },
-  { path: 'survey', component: SurveyView, title: 'Umfrage' },
+  { path: 'survey/:id', component: SurveyView, title: 'Umfrage' },
   { path: '**', redirectTo: 'home' },
 ];

@@ -20,7 +20,7 @@
 
 <div class="ending_survey_cards">
   @for (survey of endingSoon(); track survey.id) {
-    <button type="button" class="survey_card" aria-label="Open survey">
+    <button type="button" class="survey_card" [routerLink]="['/survey', survey.id]" aria-label="Open survey">
         <span class="card_category">{{ survey.category }}</span>
         <span class="card_title">{{ survey.title }}</span>
         <span class="card_badge">

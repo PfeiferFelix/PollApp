@@ -1,1 +1,26 @@
+<header>
+  <img class="logo" src="images/logo/logo.png" alt="PollApp Logo" />
+</header>
 
+<section class="survey">
+  <span class="category">{{ survey()?.category }}</span>
+  <h1>{{ survey()?.title }}</h1>
+  <p class="description">{{ survey()?.description }}</p>
+
+  <h2>{{ question()?.questions_text }}</h2>
+
+  <div class="options">
+    <label class="option" [hidden]="!options()[0]">
+      <input type="radio" name="answer"> {{ options()[0] }}
+    </label>
+    <label class="option" [hidden]="!options()[1]">
+      <input type="radio" name="answer"> {{ options()[1] }}
+    </label>
+    <label class="option" [hidden]="!options()[2]">
+      <input type="radio" name="answer"> {{ options()[2] }}
+    </label>
+    <label class="option" [hidden]="!options()[3]">
+      <input type="radio" name="answer"> {{ options()[3] }}
+    </label>
+  </div>
+</section>
