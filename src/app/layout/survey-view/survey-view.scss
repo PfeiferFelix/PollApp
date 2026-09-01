@@ -1,5 +1,252 @@
-@import '../home/home.scss';
+:host {
+    display: block;
+    min-height: 100vh;
+    padding: 40px;
+    background-color: #FFFFFF;
+
+
+    box-shadow: 0 0 0 100vmax #FFFFFF;
+    clip-path: inset(0 -100vmax);
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .logo {
+    height: 50px;
+    width: auto;
+  }
+}
+
+.create_survey_btn {
+  display: block;
+  flex: 0 0 auto;
+  border: none;
+  cursor: pointer;
+  width: 157px;
+  height: 48px;
+  background: url('/images/create_survey_button.png') no-repeat center / contain;
+  transition: transform 0.2s ease, filter 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+  margin-top: 100px;
+}
 
 .survey {
-  color: white;
+  padding: 40px;
+  background-color: #FAF5FE;
+  border-radius: 24px 88px 24px 24px;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  color: #34273B;
+}
+
+.survey__published_img {
+  display: block;
+  height: 28px;
+  width: auto;
+}
+
+.survey__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5C5468;
+}
+
+.survey__title {
+  margin: 12px 0 0;
+  max-width: 620px;
+  font-family: 'Nerko One', cursive;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: #FFB770;
+}
+
+.survey__description {
+  margin: 16px 0 0;
+  max-width: 620px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #5C5468;
+}
+
+.questions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px 48px;
+  margin-top: 40px;
+}
+
+.question__title {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #34273B;
+}
+
+.question__number {
+  flex: 0 0 auto;
+}
+
+.question__hint {
+  margin: 6px 0 0 24px;
+  font-size: 13px;
+  color: #8B8296;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 16px 0 0 24px;
+}
+
+.answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.answer__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.answer__box {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #C9C2D2;
+  border-radius: 4px;
+  background: #FFFFFF no-repeat center / 12px 12px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.answer:hover .answer__box {
+  border-color: #FFB770;
+}
+
+.answer__input:focus-visible + .answer__box {
+  outline: 2px solid #FFB770;
+  outline-offset: 2px;
+}
+
+.answer__input:checked + .answer__box {
+  border-color: #FFB770;
+  background-color: #FFB770;
+  background-image: url('/images/checkbox/checkbox_checked.png');
+}
+
+.answer__letter {
+  flex: 0 0 auto;
+  font-weight: 700;
+  color: #7C7389;
+}
+
+.answer__text {
+  color: #5C5468;
+}
+
+.results {
+  padding-top: 60px;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  color: #34273B;
+}
+
+.results__title {
+  margin: 0;
+  font-family: 'Nerko One', cursive;
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.results__live {
+  color: #FFB770;
+}
+
+.results__hint {
+  margin: 20px 0 0;
+  max-width: 340px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.results__empty {
+  margin: 100px 0 0;
+  text-align: center;
+  font-size: 15px;
+  color: #5C5468;
+}
+
+@media (max-width: 900px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .results__empty {
+    margin-top: 40px;
+  }
+}
+
+.complete_btn {
+  display: block;
+  margin: 40px 0 0 auto;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #FBD9B4;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: #34273B;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: #FFCFA1;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
 }

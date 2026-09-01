@@ -1,7 +1,7 @@
 import { Component, signal, inject, WritableSignal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Surveys } from '../../services/surveys';
-import { NewSurvey } from '../../services/service';
+import { NewQuestion, NewSurvey } from '../../services/service';
 
 interface Question {
   id: number;
@@ -177,8 +177,7 @@ minQuestions = 1;
    * @returns Promise, das erfuellt ist sobald der Speicherversuch durch ist.
    */
   async publish(): Promise<void> {
-    const options = this.filledOptions();
-    const error = this.validate(options);
+    const error = this.validate();
 
     if (error) {
       this.formError.set(error);
@@ -186,24 +185,17 @@ minQuestions = 1;
     }
 
     this.formError.set(null);
-    const ok = await this.surveys.create(this.buildSurvey(options));
+    const ok = await this.surveys.create(this.buildSurvey());
     if (ok) this.router.navigate(['/home']);
   }
 
   /**
-   * Die erste Frage. Nur sie wird derzeit gespeichert.
-   * @returns Die erste Frage der Liste.
-   */
-  firstQuestion(): Question {
-    return this.questions()[0];
-  }
-
-  /**
-   * Sammelt die ausgefuellten Antworten der ersten Frage ein.
+   * Sammelt die ausgefuellten Antworten einer Frage ein.
+   * @param question Die Frage, deren Antwortfelder gelesen werden.
    * @returns Die Antworttexte ohne Leerzeichen am Rand, leere ausgelassen.
    */
-  filledOptions(): string[] {
-    return this.firstQuestion()
+  filledOptions(question: Question): string[] {
+    return question
       .answers()
       .map((answer) => answer.text.trim())
       .filter((text) => text.length > 0);
@@ -211,33 +203,54 @@ minQuestions = 1;
 
   /**
    * Prueft, ob alle Pflichtangaben ausgefuellt sind.
-   * @param options Die bereits eingesammelten Antworttexte.
    * @returns Hinweis auf die erste fehlende Angabe, oder null wenn alles passt.
    */
-  validate(options: string[]): string | null {
+  validate(): string | null {
     if (!this.title().trim()) return 'Bitte gib der Umfrage einen Namen.';
     if (!this.category()) return 'Bitte waehle eine Kategorie.';
     if (!this.endDate()) return 'Bitte waehle ein Enddatum.';
-    if (!this.firstQuestion().text().trim()) return 'Bitte formuliere eine Frage.';
-    if (options.length < this.minAnswers) return 'Bitte fuelle zwei Antworten aus.';
+    return this.validateQuestions();
+  }
+
+  /**
+   * Prueft jede Frage auf Text und genug ausgefuellte Antworten.
+   * @returns Hinweis zur ersten unvollstaendigen Frage, oder null wenn alle passen.
+   */
+  private validateQuestions(): string | null {
+    for (const [index, question] of this.questions().entries()) {
+      const nr = index + 1;
+      if (!question.text().trim()) return `Bitte formuliere Frage ${nr}.`;
+      if (this.filledOptions(question).length < this.minAnswers) {
+        return `Bitte fuelle zwei Antworten bei Frage ${nr} aus.`;
+      }
+    }
     return null;
   }
 
   /**
    * Baut aus den Formularfeldern das Paket, das der Service speichert.
-   * @param options Die bereits eingesammelten Antworttexte.
    * @returns Die vollstaendigen Daten der neuen Umfrage.
    */
-  buildSurvey(options: string[]): NewSurvey {
-    const question = this.firstQuestion();
+  buildSurvey(): NewSurvey {
     return {
       title: this.title().trim(),
       description: this.description().trim(),
       ends_at: this.endDate(),
       category: this.category()!,
+      questions: this.questions().map((question) => this.buildQuestion(question)),
+    };
+  }
+
+  /**
+   * Macht aus einer Frage des Formulars die Zeile fuer die Datenbank.
+   * @param question Die Frage aus dem Formular.
+   * @returns Fragetext, Mehrfachauswahl und die ausgefuellten Antworten.
+   */
+  private buildQuestion(question: Question): NewQuestion {
+    return {
       questions_text: question.text().trim(),
       allow_multiple: question.allowMultiple(),
-      options,
+      options: this.filledOptions(question),
     };
   }
 }

@@ -40,7 +40,7 @@ export class Surveys {
   }
 
   /**
-   * Legt eine Umfrage samt ihrer Frage an und laedt die Liste danach neu.
+   * Legt eine Umfrage samt ihren Fragen an und laedt die Liste danach neu.
    * @param input Die Daten der neuen Umfrage.
    * @returns True bei Erfolg, false wenn ein Schritt fehlgeschlagen ist.
    */
@@ -49,7 +49,7 @@ export class Surveys {
     this.isLoading.set(true);
 
     const surveyId = await this.insertSurvey(input);
-    const ok = surveyId === null ? false : await this.insertQuestion(surveyId, input);
+    const ok = surveyId === null ? false : await this.insertQuestions(surveyId, input);
 
     if (surveyId !== null && !ok) await this.deleteSurvey(surveyId);
     this.isLoading.set(false);
@@ -99,18 +99,18 @@ export class Surveys {
   }
 
   /**
-   * Haengt die Frage mit ihren Antworten an eine bereits angelegte Umfrage.
-   * @param surveyId Id der Umfrage, zu der die Frage gehoert.
+   * Haengt alle Fragen mit ihren Antworten an eine bereits angelegte Umfrage.
+   * @param surveyId Id der Umfrage, zu der die Fragen gehoeren.
    * @param input Die Daten der neuen Umfrage.
    * @returns True bei Erfolg, false wenn das Einfuegen fehlschlug.
    */
-  private async insertQuestion(surveyId: number, input: NewSurvey): Promise<boolean> {
-    const { error } = await this.supabase.client.from('questions').insert({
+  private async insertQuestions(surveyId: number, input: NewSurvey): Promise<boolean> {
+    const rows = input.questions.map((question) => ({
       survey_id: surveyId,
-      questions_text: input.questions_text,
-      allow_multiple: input.allow_multiple,
-      options: input.options,
-    });
+      ...question,
+    }));
+
+    const { error } = await this.supabase.client.from('questions').insert(rows);
 
     if (error) this.errorMessage.set(error.message);
     return !error;

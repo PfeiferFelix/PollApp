@@ -1,26 +1,60 @@
 <header>
-  <img class="logo" src="images/logo/logo.png" alt="PollApp Logo" />
+  <img class="logo" src="images/logo/logo_hover.png" alt="PollApp Logo" />
+  <a class="create_survey_btn" routerLink="/create" aria-label="Create survey"></a>
 </header>
 
-<section class="survey">
-  <span class="category">{{ survey()?.category }}</span>
-  <h1>{{ survey()?.title }}</h1>
-  <p class="description">{{ survey()?.description }}</p>
+<div class="content">
+  <section class="survey">
+    <img class="survey__published_img" src="images/survey_Status/published.png" alt="Published" />
 
-  <h2>{{ question()?.questions_text }}</h2>
+    <div class="survey__meta">
+      <span class="survey__ends">Ends on {{ survey()?.ends_at | date: 'dd.MM.yyyy' }}</span>
+      <span class="survey__category">Category: {{ survey()?.category }}</span>
+    </div>
 
-  <div class="options">
-    <label class="option" [hidden]="!options()[0]">
-      <input type="radio" name="answer"> {{ options()[0] }}
-    </label>
-    <label class="option" [hidden]="!options()[1]">
-      <input type="radio" name="answer"> {{ options()[1] }}
-    </label>
-    <label class="option" [hidden]="!options()[2]">
-      <input type="radio" name="answer"> {{ options()[2] }}
-    </label>
-    <label class="option" [hidden]="!options()[3]">
-      <input type="radio" name="answer"> {{ options()[3] }}
-    </label>
-  </div>
-</section>
+    <h1 class="survey__title">{{ survey()?.title }}</h1>
+    <p class="survey__description">{{ survey()?.description }}</p>
+
+    <div class="questions">
+      @for (question of questions(); track question.id; let qi = $index) {
+        <div class="question">
+          <h2 class="question__title">
+            <span class="question__number">{{ qi + 1 }}.</span>
+            {{ question.questions_text }}
+          </h2>
+
+          @if (question.allow_multiple) {
+            <p class="question__hint">More than one answers are possible.</p>
+          }
+
+          <div class="answers">
+            @for (answer of question.answers; track answer; let ai = $index) {
+              <label class="answer">
+                <input
+                  class="answer__input"
+                  [type]="question.allow_multiple ? 'checkbox' : 'radio'"
+                  [name]="'question_' + question.id"
+                />
+                <span class="answer__box" aria-hidden="true"></span>
+                <span class="answer__letter">{{ letters[ai] }}.</span>
+                <span class="answer__text">{{ answer }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <button class="complete_btn" type="button">Complete survey</button>
+  </section>
+
+  <aside class="results">
+    <h2 class="results__title">Survey results <span class="results__live">LIVE</span></h2>
+
+    <p class="results__hint">
+      Results will be shown here after participants complete the survey.
+    </p>
+
+    <p class="results__empty">There are no answers yet.</p>
+  </aside>
+</div>

@@ -16,14 +16,18 @@ export interface Survey {
   questions: Question[];
 }
 
+export interface NewQuestion {
+  questions_text: string;
+  allow_multiple: boolean;
+  options: string[];
+}
+
 export interface NewSurvey {
   title: string;
   description: string;
   ends_at: string;
   category: string;
-  questions_text: string;
-  allow_multiple: boolean;
-  options: string[];
+  questions: NewQuestion[];
 }
 
 import { Injectable } from '@angular/core';

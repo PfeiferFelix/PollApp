@@ -86,7 +86,7 @@
   
     <div class="survey_grid">
     @for (survey of visibleSurveys(); track survey.id) {
-      <button type="button" class="survey_tile">
+      <button type="button" class="survey_tile" [routerLink]="['/survey', survey.id]">
         <span class="tile_category">{{ survey.category }}</span>
         <span class="tile_title">{{ survey.title }}</span>
         <span class="tile_badge">
