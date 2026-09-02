@@ -10,8 +10,6 @@ interface Question {
   answers: WritableSignal<{ id: number; text: string }[]>;
 }
 
-
-
 /**
  * Formular zum Anlegen einer neuen Umfrage samt Frage und Antworten.
  */
@@ -21,10 +19,11 @@ interface Question {
   styleUrl: './create-survey.scss',
   templateUrl: './create-survey.html',
 })
+
 export class CreateSurvey {
-  /** Nicht privat: das Template liest surveys.isLoading() und surveys.errorMessage(). */
+  /**das Template liest surveys.isLoading() und surveys.errorMessage(). */
   surveys = inject(Surveys);
-  private router = inject(Router);
+  router = inject(Router);
 
   /** Hinweis, welche Angabe im Formular noch fehlt. Null wenn alles passt. */
   formError = signal<string | null>(null);
@@ -38,10 +37,10 @@ export class CreateSurvey {
   /** Enddatum der Umfrage im Format der Datenbank. */
   endDate = signal('');
 
-  /** Auswaehlbare Kategorien. */
-  categories = ['Gaming', 'Team Activity', 'Healthy Lifestyle', 'Nature Camping and Vacation'];
+  /** Auswälbare Kategorien. */
+  categories = ['Sport', 'Health', 'Gaming', 'Vacation', 'Food', 'Artist'];
 
-  /** Gewaehlte Kategorie, oder null solange keine gewaehlt wurde. */
+  /** Gewählte Kategorie, oder null solange keine gewählt wurde. */
   category = signal<string | null>(null);
 
   /** Ob das Kategorie-Menue gerade offen ist. */
@@ -51,8 +50,7 @@ export class CreateSurvey {
   minAnswers = 2;
 
   /**minimal eine question*/
-minQuestions = 1;
-
+  minQuestions = 1;
 
   /** 1 und 2 sind schon vergeben, die naechste neue Antwort bekommt die 3. */
   nextAnswerId = 3;
@@ -60,12 +58,8 @@ minQuestions = 1;
   /** Optionaler Beschreibungstext. */
   description = signal('');
 
-
   /** Name der Umfrage. */
   title = signal('');
-
-
-
 
   /** Oeffnet das Kategorie-Menue, oder schliesst es wenn es offen war. */
   toggleCategory(): void {
@@ -178,12 +172,10 @@ minQuestions = 1;
    */
   async publish(): Promise<void> {
     const error = this.validate();
-
     if (error) {
       this.formError.set(error);
       return;
     }
-
     this.formError.set(null);
     const ok = await this.surveys.create(this.buildSurvey());
     if (ok) this.router.navigate(['/home']);
