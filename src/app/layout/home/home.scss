@@ -328,3 +328,83 @@ p{
         transform: translateY(-2px);
     }
 }
+
+
+@media (max-width: 768px) {
+  header{
+    padding-top: 30px;
+    margin-left: 40px;
+    margin-right: 40px;
+
+    .logo{
+    height: 30px;
+    width: auto;
+}
+}
+
+.main{
+    h1{
+        margin-left: 40px;
+    font-size: 50px;
+}
+
+p{
+    margin-top: -30px;
+    margin-left: 40px;
+    font-size: 20px;
+}
+
+.new_survey_btn{
+    width: 80px;
+    height: 98px;
+    background: url('/images/primary_button/new_survey.png') no-repeat center / contain;
+    margin-left: 40px;
+    
+    &:hover,
+    &:focus-visible{
+        width: 80px;
+        background-image: url('/images/primary_button/new_survey_hover.png');
+    }
+}
+.phone{
+    width: 326px;
+    height: 320px;
+    background: url('/images/phone/phone.png') no-repeat center / contain;
+}
+}
+
+.your_surveys{
+    min-height: 300px;
+    padding-top: 100px;
+    padding-bottom: 60px;
+
+    h2{
+    font-size: 40px;
+
+    }
+    p{
+    font-size: 20px;
+    margin-left: 40px;
+}
+.ending_survey_cards{
+    gap: 14px;
+
+    .survey_card{
+        width: 281px;
+        height: 250px;
+        margin-left: 40px;
+
+        .card_category{
+            font-size: 13px;
+        }
+
+        .card_title{
+            font-size: 20px;
+        }
+    }
+}
+}
+}
+
+
+
