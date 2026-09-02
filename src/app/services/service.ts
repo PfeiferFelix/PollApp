@@ -16,6 +16,18 @@ export interface Survey {
   questions: Question[];
 }
 
+export interface Vote {
+  id: number;
+  question_id: number;
+  option_index: number;
+  created_at: string;
+}
+
+export interface NewVote {
+  question_id: number;
+  option_index: number;
+}
+
 export interface NewQuestion {
   questions_text: string;
   allow_multiple: boolean;
