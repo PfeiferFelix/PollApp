@@ -1,12 +1,11 @@
 :host {
-    display: block;
-    min-height: 100vh;
-    padding: 40px;
-    background-color: #FFFFFF;
+  display: block;
+  min-height: 100vh;
+  padding: 40px;
+  background-color: #ffffff;
 
-
-    box-shadow: 0 0 0 100vmax #FFFFFF;
-    clip-path: inset(0 -100vmax);
+  box-shadow: 0 0 0 100vmax #ffffff;
+  clip-path: inset(0 -100vmax);
 }
 header {
   display: flex;
@@ -27,7 +26,9 @@ header {
   width: 157px;
   height: 48px;
   background: url('/images/create_survey_button.png') no-repeat center / contain;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
 
   &:hover,
   &:focus-visible {
@@ -50,10 +51,10 @@ header {
 
 .survey {
   padding: 40px;
-  background-color: #FAF5FE;
+  background-color: #faf5fe;
   border-radius: 24px 88px 24px 24px;
   font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  color: #34273B;
+  color: #34273b;
 }
 
 .survey__published_img {
@@ -70,7 +71,7 @@ header {
   margin-top: 16px;
   font-size: 13px;
   font-weight: 500;
-  color: #5C5468;
+  color: #5c5468;
 }
 
 .survey__title {
@@ -80,7 +81,7 @@ header {
   font-size: 48px;
   font-weight: 400;
   line-height: 1.15;
-  color: #FFB770;
+  color: #ffb770;
 }
 
 .survey__description {
@@ -88,7 +89,7 @@ header {
   max-width: 620px;
   font-size: 15px;
   line-height: 1.55;
-  color: #5C5468;
+  color: #5c5468;
 }
 
 .questions {
@@ -105,7 +106,7 @@ header {
   font-size: 17px;
   font-weight: 700;
   line-height: 1.35;
-  color: #34273B;
+  color: #34273b;
 }
 
 .question__number {
@@ -115,7 +116,7 @@ header {
 .question__hint {
   margin: 6px 0 0 24px;
   font-size: 13px;
-  color: #8B8296;
+  color: #8b8296;
 }
 
 .answers {
@@ -152,41 +153,43 @@ header {
   margin-top: 2px;
   width: 18px;
   height: 18px;
-  border: 2px solid #C9C2D2;
+  border: 2px solid #c9c2d2;
   border-radius: 4px;
-  background: #FFFFFF no-repeat center / 12px 12px;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  background: #ffffff no-repeat center / 12px 12px;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .answer:hover .answer__box {
-  border-color: #FFB770;
+  border-color: #ffb770;
 }
 
 .answer__input:focus-visible + .answer__box {
-  outline: 2px solid #FFB770;
+  outline: 2px solid #ffb770;
   outline-offset: 2px;
 }
 
 .answer__input:checked + .answer__box {
-  border-color: #FFB770;
-  background-color: #FFB770;
+  border-color: #ffb770;
+  background-color: #ffb770;
   background-image: url('/images/checkbox/checkbox_checked.png');
 }
 
 .answer__letter {
   flex: 0 0 auto;
   font-weight: 700;
-  color: #7C7389;
+  color: #7c7389;
 }
 
 .answer__text {
-  color: #5C5468;
+  color: #5c5468;
 }
 
 .results {
   padding-top: 60px;
   font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  color: #34273B;
+  color: #34273b;
 }
 
 .results__title {
@@ -197,7 +200,7 @@ header {
 }
 
 .results__live {
-  color: #FFB770;
+  color: #ffb770;
 }
 
 .results__hint {
@@ -208,11 +211,52 @@ header {
   line-height: 1.45;
 }
 
+.result {
+  margin-top: 32px;
+}
+
+.result__title {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bar__track {
+  height: 12px;
+  border-radius: 999px;
+  background-color: #ece8f0;
+}
+
+.bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background-color: #fbbf7a;
+  transition: width 0.3s ease;
+}
+
+.bar__value {
+  text-align: right;
+  color: #ffb770;
+}
+
 .results__empty {
   margin: 100px 0 0;
   text-align: center;
   font-size: 15px;
-  color: #5C5468;
+  color: #5c5468;
 }
 
 @media (max-width: 900px) {
@@ -233,20 +277,28 @@ header {
   padding: 12px 26px;
   border-radius: 8px;
   cursor: pointer;
-  background-color: #FBD9B4;
+  background-color: #fbd9b4;
   font-family: inherit;
   font-size: 14px;
   font-weight: 700;
-  color: #34273B;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  color: #34273b;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 
   &:hover,
   &:focus-visible {
-    background-color: #FFCFA1;
+    background-color: #ffcfa1;
     transform: translateY(-1px);
   }
 
   &:active {
     transform: scale(0.98);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+    transform: none;
   }
 }
