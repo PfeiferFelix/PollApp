@@ -61,7 +61,7 @@ export class Surveys {
    * Raeumt eine Umfrage weg, deren Frage nicht gespeichert werden konnte.
    * @param id Id der Umfrage, die geloescht wird.
    */
-  private async deleteSurvey(id: number): Promise<void> {
+  async deleteSurvey(id: number): Promise<void> {
     await this.supabase.client.from('surveys').delete().eq('id', id);
   }
 
@@ -70,7 +70,7 @@ export class Surveys {
    * @param input Die Daten der neuen Umfrage.
    * @returns Die neue Id, oder null wenn das Einfuegen fehlschlug.
    */
-  private async insertSurvey(input: NewSurvey): Promise<number | null> {
+  async insertSurvey(input: NewSurvey): Promise<number | null> {
     const { data, error } = await this.supabase.client
       .from('surveys')
       .insert(this.surveyRow(input))
@@ -89,7 +89,7 @@ export class Surveys {
    * @param input Die Daten der neuen Umfrage.
    * @returns Objekt mit genau den Spalten der Tabelle surveys.
    */
-  private surveyRow(input: NewSurvey) {
+  surveyRow(input: NewSurvey) {
     return {
       title: input.title,
       description: input.description,
@@ -104,7 +104,7 @@ export class Surveys {
    * @param input Die Daten der neuen Umfrage.
    * @returns True bei Erfolg, false wenn das Einfuegen fehlschlug.
    */
-  private async insertQuestions(surveyId: number, input: NewSurvey): Promise<boolean> {
+  async insertQuestions(surveyId: number, input: NewSurvey): Promise<boolean> {
     const rows = input.questions.map((question) => ({
       survey_id: surveyId,
       ...question,
