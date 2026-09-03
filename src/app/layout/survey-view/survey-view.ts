@@ -1,6 +1,6 @@
-import { Component, computed, inject, input, signal, OnInit } from '@angular/core';
+import { Component, computed, inject, input, signal, OnInit, OnDestroy } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Surveys } from '../../services/surveys';
 import { Votes } from '../../services/votes';
 import { NewVote } from '../../services/service';
@@ -14,11 +14,12 @@ import { NewVote } from '../../services/service';
   styleUrl: './survey-view.scss',
   templateUrl: './survey-view.html',
 })
-export class SurveyView implements OnInit {
+export class SurveyView implements OnInit, OnDestroy {
   id = input.required<string>();
 
   surveys = inject(Surveys);
   votes = inject(Votes);
+  router = inject(Router);
 
   /** Buchstaben vor den Antworten, in der Reihenfolge der Optionen. */
   letters = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -29,6 +30,9 @@ export class SurveyView implements OnInit {
 
   /** True, sobald in dieser Sitzung abgestimmt wurde. */
   hasVoted = signal(false);
+
+  /** Laufender Timer, der nach dem Abstimmen zurueck zur Startseite bringt. */
+  private returnTimer?: ReturnType<typeof setTimeout>;
 
   /** True, sobald mindestens eine Antwort angekreuzt ist. */
   hasSelection = computed(() =>
@@ -41,6 +45,13 @@ export class SurveyView implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.surveys.load();
     await this.votes.load(this.questionIds());
+  }
+
+  /**
+   * Stoppt den Timer, falls die Seite vorher verlassen wird.
+   */
+  ngOnDestroy(): void {
+    clearTimeout(this.returnTimer);
   }
 
   /** Die Ids aller Fragen dieser Umfrage. */
@@ -117,10 +128,10 @@ export class SurveyView implements OnInit {
     if (!rows.length || this.hasVoted()) return;
     this.hasVoted.set(true);
     const ok = await this.votes.save(rows);
-    if (!ok) this.hasVoted.set(false);
-    else await this.votes.load(this.questionIds());
+    if (!ok) return this.hasVoted.set(false);
+    await this.votes.load(this.questionIds());
+    this.scheduleReturn();
   }
-
 
 
   /**
@@ -137,7 +148,12 @@ export class SurveyView implements OnInit {
     return Math.round((hits / votes.length) * 100);
   }
 
-
-
-
+  /**
+   * Bringt den Nutzer nach dem Abstimmen zurueck zur Startseite.
+   * @param delay Wartezeit in Millisekunden.
+   */
+  private scheduleReturn(delay = 5000): void {
+    this.returnTimer = setTimeout(() => this.router.navigate(['/home']), delay);
+  }
 }
+
