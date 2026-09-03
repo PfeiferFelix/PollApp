@@ -1,4 +1,3 @@
-// src/app/interfaces/survey.ts
 export interface Question {
   id: number;
   survey_id: number;
@@ -11,7 +10,8 @@ export interface Survey {
   id: number;
   title: string;
   description: string;
-  ends_at: string;
+  /** End date, or null when the survey runs without one. */
+  ends_at: string | null;
   category: string;
   questions: Question[];
 }
@@ -37,7 +37,8 @@ export interface NewQuestion {
 export interface NewSurvey {
   title: string;
   description: string;
-  ends_at: string;
+  /** End date, or null when no date was chosen. */
+  ends_at: string | null;
   category: string;
   questions: NewQuestion[];
 }
