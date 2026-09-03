@@ -3,24 +3,24 @@ import { Supabase } from './supabase';
 import { Survey, NewSurvey } from './service';
 
 /**
- * Haelt die Umfragen der App und spricht mit Supabase.
+ * Holds the surveys of the app and talks to Supabase.
  */
 @Injectable({ providedIn: 'root' })
 export class Surveys {
   private supabase = inject(Supabase);
 
-  /** Alle geladenen Umfragen samt Fragen. Startet leer. */
+  /** All loaded surveys including their questions. Starts empty. */
   surveylist = signal<Survey[]>([]);
 
-  /** True, solange eine Datenbankanfrage laeuft. */
+  /** True as long as a database request is running. */
   isLoading = signal(false);
 
-  /** Letzte Fehlermeldung der Datenbank, sonst null. */
+  /** Last error message of the database, otherwise null. */
   errorMessage = signal<string | null>(null);
 
   /**
-   * Laedt alle Umfragen mit ihren Fragen aus der Datenbank in surveylist.
-   * @returns Promise, das erfuellt ist sobald die Liste steht.
+   * Loads all surveys with their questions from the database into surveylist.
+   * @returns Promise that resolves once the list is in place.
    */
   async load() {
     this.isLoading.set(true);
@@ -40,9 +40,9 @@ export class Surveys {
   }
 
   /**
-   * Legt eine Umfrage samt ihren Fragen an und laedt die Liste danach neu.
-   * @param input Die Daten der neuen Umfrage.
-   * @returns True bei Erfolg, false wenn ein Schritt fehlgeschlagen ist.
+   * Creates a survey along with its questions and reloads the list afterwards.
+   * @param input The data of the new survey.
+   * @returns True on success, false when one step failed.
    */
   async create(input: NewSurvey): Promise<boolean> {
     this.errorMessage.set(null);
@@ -58,17 +58,17 @@ export class Surveys {
   }
 
   /**
-   * Raeumt eine Umfrage weg, deren Frage nicht gespeichert werden konnte.
-   * @param id Id der Umfrage, die geloescht wird.
+   * Clears away a survey whose questions could not be saved.
+   * @param id Id of the survey that gets deleted.
    */
   async deleteSurvey(id: number): Promise<void> {
     await this.supabase.client.from('surveys').delete().eq('id', id);
   }
 
   /**
-   * Legt die Umfrage selbst an und gibt ihre von der Datenbank vergebene Id zurueck.
-   * @param input Die Daten der neuen Umfrage.
-   * @returns Die neue Id, oder null wenn das Einfuegen fehlschlug.
+   * Creates the survey itself and returns the id handed out by the database.
+   * @param input The data of the new survey.
+   * @returns The new id, or null when the insert failed.
    */
   async insertSurvey(input: NewSurvey): Promise<number | null> {
     const { data, error } = await this.supabase.client
@@ -85,9 +85,9 @@ export class Surveys {
   }
 
   /**
-   * Schneidet aus den Eingabedaten die Spalten heraus, die in die Tabelle surveys gehoeren.
-   * @param input Die Daten der neuen Umfrage.
-   * @returns Objekt mit genau den Spalten der Tabelle surveys.
+   * Cuts the columns belonging to the surveys table out of the input data.
+   * @param input The data of the new survey.
+   * @returns Object with exactly the columns of the surveys table.
    */
   surveyRow(input: NewSurvey) {
     return {
@@ -99,10 +99,10 @@ export class Surveys {
   }
 
   /**
-   * Haengt alle Fragen mit ihren Antworten an eine bereits angelegte Umfrage.
-   * @param surveyId Id der Umfrage, zu der die Fragen gehoeren.
-   * @param input Die Daten der neuen Umfrage.
-   * @returns True bei Erfolg, false wenn das Einfuegen fehlschlug.
+   * Appends all questions with their answers to an already created survey.
+   * @param surveyId Id of the survey the questions belong to.
+   * @param input The data of the new survey.
+   * @returns True on success, false when the insert failed.
    */
   async insertQuestions(surveyId: number, input: NewSurvey): Promise<boolean> {
     const rows = input.questions.map((question) => ({
