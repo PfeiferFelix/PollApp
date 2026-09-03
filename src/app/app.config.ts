@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withComponentInputBinding(),
-      // Jede Navigation startet oben, statt die Scroll-Position mitzunehmen.
+      // Every navigation starts at the top instead of keeping the scroll position.
       withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
     ),
     provideClientHydration(),

@@ -3,21 +3,22 @@ import { Supabase } from './supabase';
 import { NewVote, Vote } from './service';
 
 /**
- * Haelt die abgegebenen Stimmen einer Umfrage und spricht mit Supabase.
+ * Holds the votes cast on a survey and talks to Supabase.
  */
 @Injectable({ providedIn: 'root' })
 export class Votes {
   private supabase = inject(Supabase);
 
-  /** Die Stimmen zu den zuletzt geladenen Fragen. Startet leer. */
+  /** The votes belonging to the questions loaded last. Starts empty. */
   votelist = signal<Vote[]>([]);
 
-  /** Letzte Fehlermeldung der Datenbank, sonst null. */
+  /** Last error message of the database, otherwise null. */
   errorMessage = signal<string | null>(null);
 
   /**
-   * Laedt alle Stimmen, die zu den uebergebenen Fragen gehoeren.
-   * @param questionIds Ids der Fragen, deren Stimmen gesucht sind.
+   * Loads all votes belonging to the given questions.
+   * @param questionIds Ids of the questions whose votes are wanted.
+   * @returns Promise that resolves once votelist is in place.
    */
   async load(questionIds: number[]): Promise<void> {
     if (!questionIds.length) {
@@ -32,9 +33,9 @@ export class Votes {
   }
 
   /**
-   * Speichert die Kreuze eines Teilnehmers.
-   * @param rows Je ein Eintrag pro angekreuzter Antwort.
-   * @returns True bei Erfolg, false wenn das Einfuegen fehlschlug.
+   * Saves the ticks of one participant.
+   * @param rows One entry per ticked answer.
+   * @returns True on success, false when the insert failed.
    */
   async save(rows: NewVote[]): Promise<boolean> {
     const { error } = await this.supabase.client.from('votes').insert(rows);
