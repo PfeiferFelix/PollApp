@@ -1,59 +1,130 @@
 # PollApp
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.5.
+Eine Angular-Anwendung zum Erstellen und Beantworten von Umfragen. Umfragen werden mit
+mehreren Fragen und Antwortmöglichkeiten angelegt, nach Kategorie gefiltert und in Echtzeit
+ausgewertet. Die Daten liegen in einer Supabase-Datenbank.
 
-## Development server
+## Funktionen
 
-To start a local development server, run:
+- **Umfragen anlegen** – bis zu 4 Fragen mit je 2 bis 6 Antworten, wahlweise mit Mehrfachauswahl
+- **Kategorien** – Sport, Health, Gaming, Vacation, Food, Artist
+- **Enddatum** – optional; ohne Enddatum läuft eine Umfrage unbegrenzt weiter
+- **Filter auf der Startseite** – laufende oder bereits beendete Umfragen, zusätzlich nach Kategorie
+- **Abstimmen** – Ergebnisse erscheinen direkt als Prozentwerte, danach geht es automatisch zurück zur Startseite
+- **Ablaufende Umfragen** – die drei Umfragen, die als nächstes enden, werden hervorgehoben
 
-```bash
-ng serve
-```
+## Technik
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+| Bereich       | Verwendet                                     |
+| ------------- | --------------------------------------------- |
+| Framework     | Angular 22 (Standalone Components, Signals)   |
+| Datenbank     | Supabase (`@supabase/supabase-js`)            |
+| Rendering     | Angular SSR mit Express                       |
+| Styling       | SCSS                                          |
+| Tests         | Vitest                                        |
 
-## Code scaffolding
+## Einrichten
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+Node.js und npm werden vorausgesetzt (entwickelt mit npm 11).
 
 ```bash
-ng build
+npm install
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Die Zugangsdaten zu Supabase stehen in `src/environments/environment.ts` (Produktion) und
+`src/environments/environment.development.ts` (Entwicklung). Beide brauchen `supabaseUrl`
+und `supabaseKey` der eigenen Supabase-Instanz.
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Befehle
 
 ```bash
-ng test
+npm start          # Entwicklungsserver auf http://localhost:4200/
+npm run build      # Produktions-Build nach dist/
+npm run watch      # Build, der bei Änderungen neu läuft
+npm test           # Unit-Tests mit Vitest
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Den fertigen Build mit Server-Side-Rendering starten:
 
 ```bash
-ng e2e
+npm run build
+npm run serve:ssr:PollApp
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Aufbau
 
-## Additional Resources
+```
+src/app/
+├── app.ts                  Wurzelkomponente, enthält nur den RouterOutlet
+├── app.routes.ts           Die vier Routen der App
+├── app.config.ts           Router, Hydration, Scroll-Verhalten
+├── layout/
+│   ├── home/               Startseite mit Liste, Filter und Kategorie-Menü
+│   ├── create-survey/      Formular zum Anlegen einer Umfrage
+│   └── survey-view/        Einzelne Umfrage, Abstimmen und Ergebnisse
+└── services/
+    ├── service.ts          Interfaces für Survey, Question und Vote
+    ├── supabase.ts         Verbindung zur Datenbank
+    ├── surveys.ts          Umfragen laden und anlegen
+    └── votes.ts            Stimmen laden und speichern
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Routen
+
+| Pfad          | Komponente     | Zweck                          |
+| ------------- | -------------- | ------------------------------ |
+| `/home`       | `Home`         | Übersicht aller Umfragen       |
+| `/create`     | `CreateSurvey` | Neue Umfrage anlegen           |
+| `/survey/:id` | `SurveyView`   | Umfrage ansehen und abstimmen  |
+
+`/` leitet auf `/home` um, unbekannte Pfade ebenfalls. `/home` und `/create` werden beim Build
+vorgerendert, `/survey/:id` wird im Browser gerendert, weil die Id erst zur Laufzeit feststeht.
+
+### Zustand
+
+Die Komponenten halten keinen eigenen Datenbestand. `Surveys` und `Votes` sind
+`providedIn: 'root'` und legen die geladenen Daten in Signals ab (`surveylist`, `votelist`);
+die Komponenten leiten daraus mit `computed()` ab, was das Template anzeigt.
+
+## Datenmodell
+
+Drei Tabellen in Supabase:
+
+**surveys**
+
+| Spalte        | Typ    | Bedeutung                                 |
+| ------------- | ------ | ----------------------------------------- |
+| `id`          | number | Primärschlüssel                           |
+| `title`       | text   | Name der Umfrage                          |
+| `description` | text   | Beschreibungstext                         |
+| `ends_at`     | text   | Enddatum, `null` wenn ohne Enddatum       |
+| `category`    | text   | Kategorie für den Filter                  |
+
+**questions**
+
+| Spalte           | Typ     | Bedeutung                                  |
+| ---------------- | ------- | ------------------------------------------ |
+| `id`             | number  | Primärschlüssel                            |
+| `survey_id`      | number  | Verweis auf `surveys.id`                   |
+| `questions_text` | text    | Der Text der Frage                         |
+| `allow_multiple` | boolean | Ob mehrere Antworten erlaubt sind          |
+| `options`        | array   | Die Antwortmöglichkeiten in ihrer Reihenfolge |
+
+**votes**
+
+| Spalte         | Typ    | Bedeutung                                  |
+| -------------- | ------ | ------------------------------------------ |
+| `id`           | number | Primärschlüssel                            |
+| `question_id`  | number | Verweis auf `questions.id`                 |
+| `option_index` | number | Nummer der angekreuzten Antwort, 0 ist A   |
+| `created_at`   | text   | Zeitpunkt der Abgabe                       |
+
+Beim Anlegen einer Umfrage wird zuerst die Zeile in `surveys` geschrieben, dann die Fragen mit
+der zurückgegebenen `survey_id`. Schlägt der zweite Schritt fehl, wird die Umfrage wieder
+gelöscht, damit keine Umfrage ohne Fragen zurückbleibt.
+
+## Konventionen
+
+- Keine Funktion länger als 14 Zeilen
+- JSDoc auf Deutsch über jeder Funktion, eine Leerzeile zwischen zwei Funktionen
+- Formatierung über Prettier (`.prettierrc`)
