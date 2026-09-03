@@ -11,7 +11,7 @@ interface Question {
 }
 
 /**
- * Formular zum Anlegen einer neuen Umfrage samt Frage und Antworten.
+ * Form for creating a new survey.
  */
 @Component({
   imports: [RouterLink],
@@ -21,60 +21,73 @@ interface Question {
 })
 
 export class CreateSurvey {
-  /**das Template liest surveys.isLoading() und surveys.errorMessage(). */
+  /** The template reads surveys.isLoading() and surveys.errorMessage(). */
   surveys = inject(Surveys);
   router = inject(Router);
 
-  /** Hinweis, welche Angabe im Formular noch fehlt. Null wenn alles passt. */
+  /** Which entry is still missing in the form. Null when everything is fine. */
   formError = signal<string | null>(null);
 
+  /** True once the survey is saved and the success message is showing. */
+  published = signal(false);
+
+  /** How long the success message stays before going back to the home page. */
+  noticeDuration = 2500;
+
+  /** Maximum number of questions. */
   maxQuestions = 4;
+
+  /** Next id for a new question. */
   nextQuestionId = 2;
 
-  /** Buchstaben der Antwortfelder. Die Laenge legt zugleich die Obergrenze fest. */
+  /** Letters in front of the answer fields. */
   letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-  /** Enddatum der Umfrage im Format der Datenbank. */
+  /** End date of the survey. */
   endDate = signal('');
 
-  /** Auswälbare Kategorien. */
+  /** Selectable categories. */
   categories = ['Sport', 'Health', 'Gaming', 'Vacation', 'Food', 'Artist'];
 
-  /** Gewählte Kategorie, oder null solange keine gewählt wurde. */
+  /** Chosen category, or null as long as none is chosen. */
   category = signal<string | null>(null);
 
-  /** Ob das Kategorie-Menue gerade offen ist. */
+  /** Whether the category menu is currently open. */
   categoryOpen = signal(false);
 
-  /** minimal zwei antworten pro frage*/
+  /** At least two answers per question. */
   minAnswers = 2;
 
-  /**minimal eine question*/
+  /** At least one question. */
   minQuestions = 1;
 
-  /** 1 und 2 sind schon vergeben, die naechste neue Antwort bekommt die 3. */
+  /** 1 and 2 are already taken, so the next new answer gets 3. */
   nextAnswerId = 3;
 
-  /** Optionaler Beschreibungstext. */
+  /** Describing text. */
   description = signal('');
 
-  /** Name der Umfrage. */
+  /** Name of the survey. */
   title = signal('');
 
-  /** Oeffnet das Kategorie-Menue, oder schliesst es wenn es offen war. */
+  /** Opens the category menu, or closes it if it was open. */
   toggleCategory(): void {
     this.categoryOpen.update((open) => !open);
   }
 
   /**
-   * Uebernimmt die gewaehlte Kategorie und schliesst das Menue.
-   * @param cat Die gewaehlte Kategorie.
+   * Takes over the chosen category and closes the menu.
+   * @param cat The chosen category.
    */
   selectCategory(cat: string): void {
     this.category.set(cat);
     this.categoryOpen.set(false);
   }
 
+  /**
+   * Creates a new question with two empty answer fields.
+   * @returns The new question, which still has to be appended to the list.
+   */
   createQuestion(): Question {
     return {
       id: this.nextQuestionId++,
@@ -86,17 +99,18 @@ export class CreateSurvey {
       ]),
     };
   }
+
   questions = signal<Question[]>([this.createQuestion()]);
 
-  /** Haengt eine neue Frage an, solange die Obergrenze nicht erreicht ist. */
+  /** Appends a new question as long as the upper limit is not reached. */
   addQuestion(): void {
     if (this.questions().length >= this.maxQuestions) return;
     this.questions.update((list) => [...list, this.createQuestion()]);
   }
 
   /**
-   * Entfernt eine Frage, solange danach noch eine uebrig bleibt.
-   * @param id Namensschild der zu entfernenden Frage.
+   * Removes a question as long as one is left afterwards.
+   * @param id Id of the question to remove.
    */
   removeQuestion(id: number): void {
     if (this.questions().length <= this.minQuestions) return;
@@ -104,8 +118,8 @@ export class CreateSurvey {
   }
 
   /**
-   * Haengt ein leeres Antwortfeld an, solange die Obergrenze nicht erreicht ist.
-   * @param question Die Frage, zu der die Antwort gehoert.
+   * Appends an empty answer field as long as the maximum is not reached.
+   * @param question The question the answer belongs to.
    */
   addAnswer(question: Question): void {
     if (question.answers().length >= this.letters.length) return;
@@ -113,9 +127,9 @@ export class CreateSurvey {
   }
 
   /**
-   * Entfernt ein Antwortfeld, solange danach noch genug uebrig bleiben.
-   * @param question Die Frage, zu der die Antwort gehoert.
-   * @param id Namensschild der zu entfernenden Antwort.
+   * Removes an answer field as long as at least two are left.
+   * @param question The question the answer belongs to.
+   * @param id Id of the answer to remove.
    */
   removeAnswer(question: Question, id: number): void {
     if (question.answers().length <= this.minAnswers) return;
@@ -123,10 +137,10 @@ export class CreateSurvey {
   }
 
   /**
-   * Uebernimmt den getippten Text in das passende Antwortfeld.
-   * @param question Die Frage, zu der die Antwort gehoert.
-   * @param id Namensschild der bearbeiteten Antwort.
-   * @param event Das Eingabe-Ereignis des Feldes.
+   * Takes the typed text over into the matching answer field.
+   * @param question The question the answer belongs to.
+   * @param id Id of the edited answer.
+   * @param event The input event of the field.
    */
   onAnswerInput(question: Question, id: number, event: Event): void {
     const text = (event.target as HTMLInputElement).value;
@@ -136,39 +150,39 @@ export class CreateSurvey {
   }
 
   /**
-   * Uebernimmt das getippte Enddatum.
-   * @param event Das Eingabe-Ereignis des Datumsfeldes.
+   * Takes over the typed end date.
+   * @param event The input event of the date field.
    */
   onEndDateInput(event: Event): void {
     this.endDate.set((event.target as HTMLInputElement).value);
   }
 
-  /** Leert das Enddatum-Feld. */
+  /** Clears the end date field. */
   deleteEndDateInput(): void {
     this.endDate.set('');
   }
 
   /**
-   * Holt den getippten Text aus einem Eingabe-Ereignis.
-   * @param event Das Ereignis eines input- oder textarea-Feldes.
-   * @returns Der aktuelle Inhalt des Feldes.
+   * Reads the typed text out of an input event.
+   * @param event The event of an input or textarea field.
+   * @returns The current content of the field.
    */
   readValue(event: Event): string {
     return (event.target as HTMLInputElement | HTMLTextAreaElement).value;
   }
 
   /**
-   * Holt den Haken-Zustand aus einer Checkbox.
-   * @param event Das Ereignis der Checkbox.
-   * @returns True, wenn der Haken gesetzt ist.
+   * Reads the tick state out of a checkbox.
+   * @param event The event of the checkbox.
+   * @returns True when the box is ticked.
    */
   readChecked(event: Event): boolean {
     return (event.target as HTMLInputElement).checked;
   }
 
   /**
-   * Prueft die Eingaben, speichert die Umfrage und leitet bei Erfolg zur Startseite.
-   * @returns Promise, das erfuellt ist sobald der Speicherversuch durch ist.
+   * Checks the entries, saves the survey and shows the message on success.
+   * @returns Promise that resolves once the save attempt is done.
    */
   async publish(): Promise<void> {
     const error = this.validate();
@@ -178,13 +192,20 @@ export class CreateSurvey {
     }
     this.formError.set(null);
     const ok = await this.surveys.create(this.buildSurvey());
-    if (ok) this.router.navigate(['/home']);
+    if (!ok) return;
+    this.published.set(true);
+    setTimeout(() => this.goHome(), this.noticeDuration);
+  }
+
+  /** Closes the message and goes back to the home page. */
+  goHome(): void {
+    this.router.navigate(['/home']);
   }
 
   /**
-   * Sammelt die ausgefuellten Antworten einer Frage ein.
-   * @param question Die Frage, deren Antwortfelder gelesen werden.
-   * @returns Die Antworttexte ohne Leerzeichen am Rand, leere ausgelassen.
+   * Collects the filled in answers of a question.
+   * @param question The question whose answer fields are read.
+   * @returns The answer texts without surrounding spaces, empty ones left out.
    */
   filledOptions(question: Question): string[] {
     return question
@@ -194,21 +215,20 @@ export class CreateSurvey {
   }
 
   /**
-   * Prueft, ob alle Pflichtangaben ausgefuellt sind.
-   * @returns Hinweis auf die erste fehlende Angabe, oder null wenn alles passt.
+   * Checks whether all required entries are filled in.
+   * @returns Hint about the first missing entry, or null when everything is fine.
    */
   validate(): string | null {
     if (!this.title().trim()) return 'Bitte gib der Umfrage einen Namen.';
     if (!this.category()) return 'Bitte waehle eine Kategorie.';
-    if (!this.endDate()) return 'Bitte waehle ein Enddatum.';
     return this.validateQuestions();
   }
 
   /**
-   * Prueft jede Frage auf Text und genug ausgefuellte Antworten.
-   * @returns Hinweis zur ersten unvollstaendigen Frage, oder null wenn alle passen.
+   * Checks every question for its text and for enough filled in answers.
+   * @returns Hint about the first incomplete question, or null when all of them pass.
    */
-  private validateQuestions(): string | null {
+  validateQuestions(): string | null {
     for (const [index, question] of this.questions().entries()) {
       const nr = index + 1;
       if (!question.text().trim()) return `Bitte formuliere Frage ${nr}.`;
@@ -220,25 +240,25 @@ export class CreateSurvey {
   }
 
   /**
-   * Baut aus den Formularfeldern das Paket, das der Service speichert.
-   * @returns Die vollstaendigen Daten der neuen Umfrage.
+   * Builds the package the service saves out of the form fields.
+   * @returns The complete data of the new survey.
    */
   buildSurvey(): NewSurvey {
     return {
       title: this.title().trim(),
       description: this.description().trim(),
-      ends_at: this.endDate(),
+      ends_at: this.endDate() || null,
       category: this.category()!,
       questions: this.questions().map((question) => this.buildQuestion(question)),
     };
   }
 
   /**
-   * Macht aus einer Frage des Formulars die Zeile fuer die Datenbank.
-   * @param question Die Frage aus dem Formular.
-   * @returns Fragetext, Mehrfachauswahl und die ausgefuellten Antworten.
+   * Turns a question of the form into the row for the database.
+   * @param question The question from the form.
+   * @returns Question text, multiple choice flag and the filled in answers.
    */
-  private buildQuestion(question: Question): NewQuestion {
+  buildQuestion(question: Question): NewQuestion {
     return {
       questions_text: question.text().trim(),
       allow_multiple: question.allowMultiple(),
