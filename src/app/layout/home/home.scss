@@ -140,9 +140,7 @@ $tile-gap: 24px;
   font-family: $font-body;
   color: #34273b;
   background: url('/images/highlights_card/highlights_card.png') no-repeat center / contain;
-  transition:
-    transform 0.25s ease,
-    filter 0.25s ease;
+  transition: filter 0.25s ease;
 
   &::after {
     content: '';
@@ -181,11 +179,11 @@ $tile-gap: 24px;
     font-weight: 500;
     line-height: 1.2;
     white-space: nowrap;
+    transition: transform 0.25s ease;
   }
 
   &:hover,
   &:focus-visible {
-    transform: translateY(-8px) scale(1.03);
     filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.35));
 
     &::after {
@@ -193,8 +191,9 @@ $tile-gap: 24px;
     }
   }
 
-  &:active {
-    transform: translateY(-4px) scale(1.01);
+  &:hover &__badge,
+  &:focus-visible &__badge {
+    transform: translateY(-6px);
   }
 }
 
