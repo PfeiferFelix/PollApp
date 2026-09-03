@@ -1,106 +1,135 @@
-<header>
-  <img class="logo" src="images/logo/logo.png" alt="PollApp Logo" />
+<header class="page-header">
+  <a class="page-header__link" routerLink="/home">
+    <img class="page-header__logo" src="images/logo/logo.png" alt="PollApp Logo" />
+  </a>
 </header>
 
-<section class="main">
-  <div class="intro">
-    <h1>Collect Feedback,<br>Unlock Ideas</h1>
-    <p>Create and share surveys in minutes – from team events to <br>
-      workplace culture. Collect opinions, engage your audience,<br>
-      and turn feedback into action.</p>
+<section class="hero">
+  <div class="hero__intro">
+    <h1 class="hero__title">Collect Feedback,<br />Unlock Ideas</h1>
+    <p class="hero__text">
+      Create and share surveys in minutes – from team events to <br />
+      workplace culture. Collect opinions, engage your audience,<br />
+      and turn feedback into action.
+    </p>
 
-    <button type="button" class="new_survey_btn" routerLink="/create" aria-label="New survey"></button>
+    <button type="button" class="hero__cta" routerLink="/create" aria-label="New survey"></button>
   </div>
 
-  <div class="phone" aria-hidden="true"></div>
-</section>
-<section class="your_surveys">
-    <h2>Your surveys</h2>
-    <p>Ending soon surveys</p>
-
-<div class="ending_survey_cards">
-  @for (survey of endingSoon(); track survey.id) {
-    <button type="button" class="survey_card" [routerLink]="['/survey', survey.id]" aria-label="Open survey">
-        <span class="card_category">{{ survey.category }}</span>
-        <span class="card_title">{{ survey.title }}</span>
-        <span class="card_badge">
-          Ends in {{ daysLeft(survey.ends_at) }}
-          {{ daysLeft(survey.ends_at) === 1 ? 'Day' : 'Days' }}
-        </span>
-    </button>
-  }
-</div>
-
-
+  <div class="hero__phone" aria-hidden="true"></div>
 </section>
 
-<section class="active_surveys">
-  <div class="surveys_toolbar">
-    <div class="survey_filter" role="group" aria-label="Filter surveys">
-        <button type="button"
-                class="filter_btn"
-                [class.is_selected]="filter() === 'active'"
-                [attr.aria-pressed]="filter() === 'active'"
-                (click)="filter.set('active')">Active survey</button>
-        <button type="button"
-                class="filter_btn"
-                [class.is_selected]="filter() === 'past'"
-                [attr.aria-pressed]="filter() === 'past'"
-                (click)="filter.set('past')">Past survey</button>
-    </div>
-    <div class="dropdown">
-        <button type="button"
-                class="dropdown_btn"
-                aria-haspopup="menu"
-                [attr.aria-expanded]="dropdownOpen()"
-                aria-label="Sort by categories"
-                (click)="toggleDropdown()">
-            <img src="images/dropdown_menu/dorpdown_menu.png" alt="">
-        </button>
+<section class="highlights">
+  <h2 class="highlights__title">Your surveys</h2>
+  <p class="highlights__subtitle">Ending soon surveys</p>
 
-        @if (dropdownOpen()) {
-          <ul class="dropdown_list" role="menu" aria-label="Categories">
-            <li>
-              <button type="button"
-                      role="menuitemradio"
-                      class="dropdown_item"
-                      [class.is_selected]="category() === null"
-                      [attr.aria-checked]="category() === null"
-                      (click)="selectCategory(null)">All categories</button>
-            </li>
-            @for (cat of categories(); track cat) {
-              <li>
-                <button type="button"
-                        role="menuitemradio"
-                        class="dropdown_item"
-                        [class.is_selected]="category() === cat"
-                        [attr.aria-checked]="category() === cat"
-                        (click)="selectCategory(cat)">{{ cat }}</button>
-              </li>
-            }
-          </ul>
-        }
-    </div>
-  </div>
-
-  
-    <div class="survey_grid">
-    @for (survey of visibleSurveys(); track survey.id) {
-      <button type="button" class="survey_tile" [routerLink]="['/survey', survey.id]">
-        <span class="tile_category">{{ survey.category }}</span>
-        <span class="tile_title">{{ survey.title }}</span>
-        <span class="tile_badge">
-          Ends in {{ daysLeft(survey.ends_at) }}
-          {{ daysLeft(survey.ends_at) === 1 ? 'Day' : 'Days' }}
+  <div class="highlights__cards">
+    @for (survey of endingSoon(); track survey.id) {
+      <button
+        type="button"
+        class="card"
+        [routerLink]="['/survey', survey.id]"
+        aria-label="Open survey"
+      >
+        <span class="card__category">{{ survey.category }}</span>
+        <span class="card__title">{{ survey.title }}</span>
+        <span class="card__badge">
+          @if (survey.ends_at) {
+            Ends in {{ daysLeft(survey.ends_at) }}
+            {{ daysLeft(survey.ends_at) === 1 ? 'Day' : 'Days' }}
+          } @else {
+            No end date
+          }
         </span>
       </button>
-    } @empty {
-      <p>Keine Umfragen.</p>
     }
   </div>
 </section>
 
-  
+<section class="surveys">
+  <div class="surveys__toolbar">
+    <div class="filter" role="group" aria-label="Filter surveys">
+      <button
+        type="button"
+        class="filter__btn"
+        [class.filter__btn--active]="filter() === 'active'"
+        [attr.aria-pressed]="filter() === 'active'"
+        (click)="filter.set('active')"
+      >
+        Active survey
+      </button>
+      <button
+        type="button"
+        class="filter__btn"
+        [class.filter__btn--active]="filter() === 'past'"
+        [attr.aria-pressed]="filter() === 'past'"
+        (click)="filter.set('past')"
+      >
+        Past survey
+      </button>
+    </div>
 
+    <div class="dropdown">
+      <button
+        type="button"
+        class="dropdown__btn"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="dropdownOpen()"
+        aria-label="Sort by categories"
+        (click)="toggleDropdown()"
+      >
+        <img class="dropdown__icon" src="images/dropdown_menu/dorpdown_menu.png" alt="" />
+      </button>
 
+      @if (dropdownOpen()) {
+        <ul class="dropdown__list" role="menu" aria-label="Categories">
+          <li>
+            <button
+              type="button"
+              role="menuitemradio"
+              class="dropdown__item"
+              [class.dropdown__item--active]="category() === null"
+              [attr.aria-checked]="category() === null"
+              (click)="selectCategory(null)"
+            >
+              All categories
+            </button>
+          </li>
+          @for (cat of categories(); track cat) {
+            <li>
+              <button
+                type="button"
+                role="menuitemradio"
+                class="dropdown__item"
+                [class.dropdown__item--active]="category() === cat"
+                [attr.aria-checked]="category() === cat"
+                (click)="selectCategory(cat)"
+              >
+                {{ cat }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
 
+  <div class="surveys__grid">
+    @for (survey of visibleSurveys(); track survey.id) {
+      <button type="button" class="tile" [routerLink]="['/survey', survey.id]">
+        <span class="tile__category">{{ survey.category }}</span>
+        <span class="tile__title">{{ survey.title }}</span>
+        <span class="tile__badge">
+          @if (survey.ends_at) {
+            Ends in {{ daysLeft(survey.ends_at) }}
+            {{ daysLeft(survey.ends_at) === 1 ? 'Day' : 'Days' }}
+          } @else {
+            No end date
+          }
+        </span>
+      </button>
+    } @empty {
+      <p class="surveys__empty">Keine Umfragen.</p>
+    }
+  </div>
+</section>

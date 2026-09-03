@@ -1,21 +1,29 @@
-<header>
-  <img class="logo" src="images/logo/logo_hover.png" alt="PollApp Logo" />
-  <a class="create_survey_btn" routerLink="/create" aria-label="Create survey"></a>
+<header class="page-header">
+  <a class="page-header__link" routerLink="/home">
+    <img class="page-header__logo" src="images/logo/logo_hover.png" alt="PollApp Logo" />
+  </a>
+  <a class="page-header__create" routerLink="/create" aria-label="Create survey"></a>
 </header>
 
 <div class="content">
   <section class="survey">
-    <img class="survey__published_img" src="images/survey_Status/published.png" alt="Published" />
+    <img class="survey__published" src="images/survey_Status/published.png" alt="Published" />
 
     <div class="survey__meta">
-      <span class="survey__ends">Ends on {{ survey()?.ends_at | date: 'dd.MM.yyyy' }}</span>
+      <span class="survey__ends">
+        @if (survey()?.ends_at) {
+          Ends on {{ survey()?.ends_at | date: 'dd.MM.yyyy' }}
+        } @else {
+          No end date
+        }
+      </span>
       <span class="survey__category">Category: {{ survey()?.category }}</span>
     </div>
 
     <h1 class="survey__title">{{ survey()?.title }}</h1>
     <p class="survey__description">{{ survey()?.description }}</p>
 
-    <div class="questions">
+    <div class="survey__questions">
       @for (question of questions(); track question.id; let qi = $index) {
         <div class="question">
           <h2 class="question__title">
@@ -27,7 +35,7 @@
             <p class="question__hint">More than one answers are possible.</p>
           }
 
-          <div class="answers">
+          <div class="question__answers">
             @for (answer of question.answers; track $index; let ai = $index) {
               <label class="answer">
                 <input
@@ -49,7 +57,7 @@
     </div>
 
     <button
-      class="complete_btn"
+      class="survey__submit"
       type="button"
       [disabled]="hasVoted() || !hasSelection()"
       (click)="submit()"
