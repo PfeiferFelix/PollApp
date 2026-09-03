@@ -6,7 +6,7 @@ import { Votes } from '../../services/votes';
 import { NewVote } from '../../services/service';
 
 /**
- * Zeigt eine einzelne Umfrage mit ihren Fragen und Antwortmoeglichkeiten.
+ * Shows a single survey with its questions and answer options.
  */
 @Component({
   imports: [RouterLink, DatePipe],
@@ -21,26 +21,26 @@ export class SurveyView implements OnInit, OnDestroy {
   votes = inject(Votes);
   router = inject(Router);
 
-  /** Buchstaben vor den Antworten, in der Reihenfolge der Optionen. */
+  /** Letters in front of the answers, in the order of the options. */
   letters = ['A', 'B', 'C', 'D', 'E', 'F'];
 
-  /** Angekreuzte Antworten je Frage-Id. */
+  /** Ticked answers per question id. */
   selection = signal<Record<number, number[]>>({});
 
-
-  /** True, sobald in dieser Sitzung abgestimmt wurde. */
+  /** True once a vote has been cast in this session. */
   hasVoted = signal(false);
 
-  /** Laufender Timer, der nach dem Abstimmen zurueck zur Startseite bringt. */
+  /** Running timer that brings the user back to the home page after voting. */
   private returnTimer?: ReturnType<typeof setTimeout>;
 
-  /** True, sobald mindestens eine Antwort angekreuzt ist. */
+  /** True once at least one answer is ticked. */
   hasSelection = computed(() =>
     Object.values(this.selection()).some((indexes) => indexes.length > 0),
   );
 
   /**
-   * Laedt die Umfrage und danach die schon abgegebenen Stimmen.
+   * Loads the survey and afterwards the votes that were already cast.
+   * @returns Promise that resolves once both requests are done.
    */
   async ngOnInit(): Promise<void> {
     await this.surveys.load();
@@ -48,23 +48,23 @@ export class SurveyView implements OnInit, OnDestroy {
   }
 
   /**
-   * Stoppt den Timer, falls die Seite vorher verlassen wird.
+   * Stops the timer in case the page is left beforehand.
    */
   ngOnDestroy(): void {
     clearTimeout(this.returnTimer);
   }
 
-  /** Die Ids aller Fragen dieser Umfrage. */
+  /** The ids of all questions of this survey. */
   questionIds(): number[] {
     return this.questions().map((question) => question.id);
   }
 
-  /** Die Umfrage, die zur Id aus der URL gehoert, oder undefined. */
+  /** The survey belonging to the id from the URL, or undefined. */
   survey = computed(() =>
     this.surveys.surveylist().find((s) => s.id === Number(this.id())),
   );
 
-  /** Alle Fragen der Umfrage, jede mit ihren Antworten als fertige Liste. */
+  /** All questions of the survey, each with its answers as a ready made list. */
   questions = computed(() =>
     (this.survey()?.questions ?? []).map((question) => ({
       ...question,
@@ -73,9 +73,9 @@ export class SurveyView implements OnInit, OnDestroy {
   );
 
   /**
-   * Macht aus dem Datenbankwert eine echte Liste von Antworten.
-   * @param value Array, JSON-Text oder einzelner Text aus der Spalte options.
-   * @returns Die Antworten als Liste, notfalls leer.
+   * Turns the database value into a real list of answers.
+   * @param value Array, JSON text or single text from the options column.
+   * @returns The answers as a list, empty if nothing else works.
    */
   toList(value: unknown): string[] {
     if (Array.isArray(value)) return value;
@@ -85,19 +85,20 @@ export class SurveyView implements OnInit, OnDestroy {
   }
 
   /**
- * Ob eine bestimmte Antwort gerade angekreuzt ist.
- * @param questionId Id der Frage.
- * @param index Nummer der Antwort, 0 ist A.
- */
+   * Whether a certain answer is ticked right now.
+   * @param questionId Id of the question.
+   * @param index Number of the answer, 0 is A.
+   * @returns True when this answer is ticked.
+   */
   isChecked(questionId: number, index: number): boolean {
     return (this.selection()[questionId] ?? []).includes(index);
   }
 
   /**
-   * Setzt oder entfernt den Haken bei einer Antwort.
-   * @param questionId Id der Frage.
-   * @param multiple Ob die Frage mehrere Antworten erlaubt.
-   * @param index Nummer der angeklickten Antwort.
+   * Sets or removes the tick on an answer.
+   * @param questionId Id of the question.
+   * @param multiple Whether the question allows several answers.
+   * @param index Number of the clicked answer.
    */
   toggle(questionId: number, multiple: boolean, index: number): void {
     const chosen = this.selection()[questionId] ?? [];
@@ -111,9 +112,9 @@ export class SurveyView implements OnInit, OnDestroy {
   }
 
   /**
- * Macht aus der Auswahl die Zeilen fuer die Datenbank.
- * @returns Je ein Eintrag pro angekreuzter Antwort.
- */
+   * Turns the selection into the rows for the database.
+   * @returns One entry per ticked answer.
+   */
   chosenRows(): NewVote[] {
     return Object.entries(this.selection()).flatMap(([id, indexes]) =>
       indexes.map((option_index) => ({ question_id: Number(id), option_index })),
@@ -121,7 +122,8 @@ export class SurveyView implements OnInit, OnDestroy {
   }
 
   /**
-   * Schickt die angekreuzten Antworten an die Datenbank.
+   * Sends the ticked answers to the database.
+   * @returns Promise that resolves once the save attempt is done.
    */
   async submit(): Promise<void> {
     const rows = this.chosenRows();
@@ -133,12 +135,11 @@ export class SurveyView implements OnInit, OnDestroy {
     this.scheduleReturn();
   }
 
-
   /**
-   * Wie viel Prozent der Stimmen einer Frage auf eine Antwort entfallen.
-   * @param questionId Id der Frage.
-   * @param index Nummer der Antwort, 0 ist A.
-   * @returns Anteil in Prozent, gerundet. Ohne Stimmen 0.
+   * How many percent of the votes of a question go to one answer.
+   * @param questionId Id of the question.
+   * @param index Number of the answer, 0 is A.
+   * @returns Share in percent, rounded. Without votes 0.
    */
   percent(questionId: number, index: number): number {
     const votes = this.votes.votelist().filter((v) => v.question_id === questionId);
@@ -149,11 +150,10 @@ export class SurveyView implements OnInit, OnDestroy {
   }
 
   /**
-   * Bringt den Nutzer nach dem Abstimmen zurueck zur Startseite.
-   * @param delay Wartezeit in Millisekunden.
+   * Brings the user back to the home page after voting.
+   * @param delay Waiting time in milliseconds.
    */
-  private scheduleReturn(delay = 5000): void {
+  scheduleReturn(delay = 5000): void {
     this.returnTimer = setTimeout(() => this.router.navigate(['/home']), delay);
   }
 }
-
