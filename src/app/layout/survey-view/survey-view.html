@@ -12,7 +12,7 @@
     <div class="survey__meta">
       <span class="survey__ends">
         @if (survey()?.ends_at) {
-          Ends on {{ survey()?.ends_at | date: 'dd.MM.yyyy' }}
+          {{ isClosed() ? 'Ended on' : 'Ends on' }} {{ survey()?.ends_at | date: 'dd.MM.yyyy' }}
         } @else {
           No end date
         }
@@ -22,6 +22,12 @@
 
     <h1 class="survey__title">{{ survey()?.title }}</h1>
     <p class="survey__description">{{ survey()?.description }}</p>
+
+    @if (isClosed()) {
+      <p class="survey__notice">This survey has ended. You can only look at the results.</p>
+    } @else if (hasVoted()) {
+      <p class="survey__notice">You already took part in this survey. Thanks for voting!</p>
+    }
 
     <div class="survey__questions">
       @for (question of questions(); track question.id; let qi = $index) {
@@ -37,12 +43,13 @@
 
           <div class="question__answers">
             @for (answer of question.answers; track $index; let ai = $index) {
-              <label class="answer">
+              <label class="answer" [class.answer--locked]="isLocked()">
                 <input
                   class="answer__input"
                   [type]="question.allow_multiple ? 'checkbox' : 'radio'"
                   [name]="'question_' + question.id"
                   [checked]="isChecked(question.id, ai)"
+                  [disabled]="isLocked()"
                   (change)="toggle(question.id, question.allow_multiple, ai)"
                 />
 
@@ -59,46 +66,59 @@
     <button
       class="survey__submit"
       type="button"
-      [disabled]="hasVoted() || !hasSelection()"
+      [disabled]="isLocked() || !hasSelection()"
       (click)="submit()"
     >
-      {{ hasVoted() ? 'Thanks for voting' : 'Complete survey' }}
+      {{ submitLabel() }}
     </button>
   </section>
 
-  <aside class="results">
-    <h2 class="results__title">Survey results <span class="results__live">LIVE</span></h2>
+  <button
+    class="results-toggle"
+    type="button"
+    [attr.aria-expanded]="resultsOpen()"
+    aria-controls="survey-results"
+    (click)="toggleResults()"
+  >
+    {{ resultsOpen() ? 'Close results' : 'Show results' }}
+    <span class="results-toggle__icon" [class.results-toggle__icon--closed]="!resultsOpen()" aria-hidden="true"></span>
+  </button>
 
-    <p class="results__hint">Results will be shown here after participants complete the survey.</p>
+  @if (resultsOpen()) {
+    <aside id="survey-results" class="results">
+      <h2 class="results__title">Survey results <span class="results__live">LIVE</span></h2>
 
-    @if (!votes.votelist().length) {
-      <p class="results__empty">There are no answers yet.</p>
-    } @else {
-      @for (question of questions(); track question.id; let qi = $index) {
-        <div class="result">
-          <h3 class="result__title">
-            <span class="result__number">{{ qi + 1 }}.</span>
-            {{ question.questions_text }}
-          </h3>
+      <p class="results__hint">Results will be shown here after participants complete the survey.</p>
 
-          @for (answer of question.answers; track $index; let ai = $index) {
-            <div class="bar">
-              <span class="bar__letter">{{ letters[ai] }}</span>
-              <div
-                class="bar__track"
-                role="meter"
-                [attr.aria-valuenow]="percent(question.id, ai)"
-                aria-valuemin="0"
-                aria-valuemax="100"
-                [attr.aria-label]="answer"
-              >
-                <div class="bar__fill" [style.width.%]="percent(question.id, ai)"></div>
+      @if (!previewVotes().length) {
+        <p class="results__empty">There are no answers yet.</p>
+      } @else {
+        @for (question of questions(); track question.id; let qi = $index) {
+          <div class="result">
+            <h3 class="result__title">
+              <span class="result__number">{{ qi + 1 }}.</span>
+              {{ question.questions_text }}
+            </h3>
+
+            @for (answer of question.answers; track $index; let ai = $index) {
+              <div class="bar">
+                <span class="bar__letter">{{ letters[ai] }}</span>
+                <div
+                  class="bar__track"
+                  role="meter"
+                  [attr.aria-valuenow]="percent(question.id, ai)"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [attr.aria-label]="answer"
+                >
+                  <div class="bar__fill" [style.width.%]="percent(question.id, ai)"></div>
+                </div>
+                <span class="bar__value">{{ percent(question.id, ai) }}%</span>
               </div>
-              <span class="bar__value">{{ percent(question.id, ai) }}%</span>
-            </div>
-          }
-        </div>
+            }
+          </div>
+        }
       }
-    }
-  </aside>
+    </aside>
+  }
 </div>
