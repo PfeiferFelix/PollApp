@@ -42,9 +42,9 @@ export class Surveys {
   /**
    * Creates a survey along with its questions and reloads the list afterwards.
    * @param input The data of the new survey.
-   * @returns True on success, false when one step failed.
+   * @returns The id of the new survey on success, otherwise null.
    */
-  async create(input: NewSurvey): Promise<boolean> {
+  async create(input: NewSurvey): Promise<number | null> {
     this.errorMessage.set(null);
     this.isLoading.set(true);
 
@@ -54,7 +54,7 @@ export class Surveys {
     if (surveyId !== null && !ok) await this.deleteSurvey(surveyId);
     this.isLoading.set(false);
     if (ok) await this.load();
-    return ok;
+    return ok ? surveyId : null;
   }
 
   /**

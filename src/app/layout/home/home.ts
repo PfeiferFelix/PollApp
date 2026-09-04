@@ -111,9 +111,11 @@ export class Home {
     this.dropdownOpen.set(false);
   }
 
-  /** The three surveys that end next. */
+  /** The three running surveys that end next; expired surveys never show up here. */
   endingSoon = computed(() =>
-    [...this.surveys.surveylist()]
+    this.surveys
+      .surveylist()
+      .filter((s) => this.isActive(s))
       .sort((a, b) => this.endTime(a) - this.endTime(b))
       .slice(0, 3),
   );

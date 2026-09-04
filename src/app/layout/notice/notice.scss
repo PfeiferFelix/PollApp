@@ -5,31 +5,31 @@
 .notice {
   position: fixed;
   right: 0;
-  bottom: 48px;
+  bottom: 56px;
   z-index: 50;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  max-width: 250px;
-  padding: 12px 14px;
-  border-radius: 12px 12px 36px 12px;
+  gap: 16px;
+  max-width: 380px;
+  padding: 22px 26px;
+  border-radius: 16px 16px 48px 16px;
   background-color: #fee9d4;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
   animation: notice-slide-in 0.4s ease-out both;
 
   &__text {
     margin: 0;
     font-family: 'Nerko One', cursive;
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 400;
-    line-height: 1.2;
+    line-height: 1.25;
     color: #34273b;
   }
 
   &__close {
     flex: 0 0 auto;
     display: inline-flex;
-    margin-top: 1px;
+    margin-top: 2px;
     border: none;
     padding: 2px;
     background: none;
@@ -49,8 +49,8 @@
 
   &__icon {
     display: block;
-    height: 13px;
-    width: 13px;
+    height: 18px;
+    width: 18px;
   }
 }
 
@@ -79,7 +79,7 @@
     max-width: none;
 
     &__text {
-      font-size: 15px;
+      font-size: 19px;
     }
   }
 }

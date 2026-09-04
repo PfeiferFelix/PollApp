@@ -1,12 +1,15 @@
 <section class="create">
   <div class="create__card">
     <div class="card-header">
-      <img class="card-header__badge" src="images/survey_Status/draft.png" alt="Draft" />
+      <span class="card-header__badge">Draft</span>
 
       <h1 class="card-header__title">Create new survey</h1>
 
-      <a class="card-header__cancel" routerLink="/home" aria-label="Cancel">
-        <img class="card-header__cancel-icon" src="images/Secpondary button.png" alt="" />
+      <a class="card-header__cancel" routerLink="/home">
+        <svg class="card-header__cancel-icon" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        Cancel
       </a>
     </div>
 
@@ -62,36 +65,38 @@
 
             <div class="field field--category">
               <div class="dropdown">
-                <button
-                  class="category-btn"
-                  type="button"
-                  aria-haspopup="menu"
-                  [attr.aria-expanded]="categoryOpen()"
-                  [attr.aria-invalid]="fieldError('category') ? 'true' : null"
-                  (click)="toggleCategory()"
-                >
-                  {{ category() ?? 'Choose category' }}
-                  <span class="category-btn__arrow" aria-hidden="true"></span>
-                </button>
+                <div class="dropdown__shell" [class.dropdown__shell--open]="categoryOpen()">
+                  <button
+                    class="category-btn"
+                    type="button"
+                    aria-haspopup="menu"
+                    [attr.aria-expanded]="categoryOpen()"
+                    [attr.aria-invalid]="fieldError('category') ? 'true' : null"
+                    (click)="toggleCategory()"
+                  >
+                    {{ category() ?? 'Choose category' }}
+                    <span class="category-btn__arrow" aria-hidden="true"></span>
+                  </button>
 
-              @if (categoryOpen()) {
-                <ul class="dropdown__list" role="menu" aria-label="Categories">
-                  @for (cat of categories; track cat) {
-                    <li>
-                      <button
-                        type="button"
-                        role="menuitemradio"
-                        class="dropdown__item"
-                        [class.dropdown__item--active]="category() === cat"
-                        [attr.aria-checked]="category() === cat"
-                        (click)="selectCategory(cat)"
-                      >
-                        {{ cat }}
-                      </button>
-                    </li>
+                  @if (categoryOpen()) {
+                    <ul class="dropdown__list" role="menu" aria-label="Categories">
+                      @for (cat of categories; track cat) {
+                        <li>
+                          <button
+                            type="button"
+                            role="menuitemradio"
+                            class="dropdown__item"
+                            [class.dropdown__item--active]="category() === cat"
+                            [attr.aria-checked]="category() === cat"
+                            (click)="selectCategory(cat)"
+                          >
+                            {{ cat }}
+                          </button>
+                        </li>
+                      }
+                    </ul>
                   }
-                </ul>
-              }
+                </div>
               </div>
               @if (fieldError('category'); as error) {
                 <p class="field__error">{{ error }}</p>
@@ -190,9 +195,14 @@
                 <button
                   class="answers__add"
                   type="button"
-                  aria-label="Add answer"
                   (click)="addAnswer(question)"
-                ></button>
+                >
+                  Add answer
+                  <svg class="answers__add-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6" />
+                    <path d="M12 7V17M7 12H17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  </svg>
+                </button>
               }
             </div>
           </div>
@@ -203,8 +213,13 @@
             (click)="addQuestion()"
             class="inputs__add-question"
             type="button"
-            aria-label="Add next question"
-          ></button>
+          >
+            Add next question
+            <svg class="inputs__add-question-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6" />
+              <path d="M12 7V17M7 12H17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </button>
         }
       </div>
     </section>
@@ -218,10 +233,12 @@
       type="button"
       [disabled]="surveys.isLoading() || published()"
       (click)="publish()"
-    ></button>
+    >
+      Publish
+    </button>
   </div>
 
   @if (published()) {
-    <app-notice text="Your survey is now published" (closed)="goHome()" />
+    <app-notice text="Your survey is now published" (closed)="goToCreatedSurvey()" />
   }
 </section>

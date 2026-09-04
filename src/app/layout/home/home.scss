@@ -1,5 +1,5 @@
 $section-width: 1040px;
-$font-body: 'Red Rose', Arial, sans-serif;
+$font-body: 'Mulish', Arial, sans-serif;
 $tile-height: 160px;
 $tile-gap: 24px;
 
@@ -60,19 +60,69 @@ $tile-gap: 24px;
   }
 
   &__cta {
-    width: 138px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 138px;
     height: 48px;
     margin-top: 44px;
     border: none;
-    padding: 0;
+    padding: 0 30px;
+    border-radius: 999px;
     cursor: pointer;
-    background: url('../../../../public/images/primary_button/new_survey.png') no-repeat center / contain;
+    background-color: #ffcfa1;
+    font-family: 'Nokora', $font-body;
+    font-size: 16px;
+    font-weight: 700;
+    color: #221227;
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
 
     &:hover,
     &:focus-visible {
-      width: 172px;
-      background-image: url('../../../../public/images/primary_button/new_survey_hover.png');
+      background-color: #ffb770;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
     }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+
+  &__cta-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 0;
+    height: 22px;
+    margin-left: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: scale(0.5);
+    transition:
+      width 0.2s ease,
+      margin-left 0.2s ease,
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    svg {
+      display: block;
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  &__cta:hover &__cta-icon,
+  &__cta:focus-visible &__cta-icon {
+    width: 22px;
+    margin-left: 10px;
+    opacity: 1;
+    transform: scale(1);
   }
 
   &__phone {
@@ -139,56 +189,46 @@ $tile-gap: 24px;
   cursor: pointer;
   font-family: $font-body;
   color: #34273b;
-  background: url('../../../../public/images/highlights_card/highlights_card.png') no-repeat center / contain;
-  transition: filter 0.25s ease;
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    background: url('../../../../public/images/highlights_card/highlights_card_hover.png') no-repeat center / contain;
-    transition: opacity 0.25s ease;
-  }
+  background-color: #faf5fe;
+  border-radius: 24px 88px 24px 24px;
+  transition:
+    transform 0.25s ease,
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
 
   &__category {
-    position: relative;
-    z-index: 1;
     font-size: 15px;
     font-weight: 500;
     line-height: 1.2;
+    color: #8b8296;
   }
 
   &__title {
-    position: relative;
-    z-index: 1;
     margin-top: 12px;
     font-size: 28px;
     font-weight: 700;
     line-height: 1.2;
+    color: #34273b;
   }
 
   &__badge {
-    position: relative;
-    z-index: 1;
     margin-top: auto;
     padding: 6px 12px;
     border-radius: 4px;
-    background-color: #f5c18e;
+    background-color: #ffb770;
     font-size: 14px;
     font-weight: 500;
     line-height: 1.2;
+    color: #34273b;
     white-space: nowrap;
     transition: transform 0.25s ease;
   }
 
   &:hover,
   &:focus-visible {
-    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.35));
-
-    &::after {
-      opacity: 1;
-    }
+    background-color: #f3ebfb;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
   }
 
   &:hover &__badge,
@@ -268,48 +308,63 @@ $tile-gap: 24px;
   position: relative;
   flex: 0 0 auto;
 
-  &__btn {
-    display: flex;
-    align-items: center;
-    border: none;
-    padding: 0;
-    background: none;
-    cursor: pointer;
-    opacity: 0.85;
-    transition:
-      opacity 0.2s ease,
-      transform 0.2s ease;
+  &__shell {
+    border-radius: 8px;
 
-    &:hover,
-    &:focus-visible {
-      opacity: 1;
-      transform: translateY(-1px);
-    }
-
-    &:active {
-      transform: scale(0.97);
+    &--open {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 20;
+      min-width: 220px;
+      overflow: hidden;
+      background-color: #ffffff;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
     }
   }
 
-  &__icon {
-    display: block;
-    height: 30px;
-    width: auto;
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: none;
+    padding: 8px 4px;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: $font-body;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #ffffff;
+    transition: color 0.2s ease;
+  }
+
+  &__shell--open &__btn {
+    padding: 10px 16px;
+    color: #34273b;
+  }
+
+  &__arrow {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid currentColor;
+    transition: transform 0.2s ease;
+
+    &--open {
+      transform: rotate(180deg);
+    }
   }
 
   &__list {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    z-index: 20;
-    min-width: 190px;
     margin: 0;
-    padding: 6px;
+    padding: 0 8px 8px;
     list-style: none;
     font-family: $font-body;
-    border-radius: 12px;
-    background-color: #3b2e45;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
   }
 
   &__item {
@@ -324,14 +379,14 @@ $tile-gap: 24px;
     font-family: $font-body;
     font-size: 14px;
     line-height: 1.2;
-    color: #ffffff;
+    color: #34273b;
     transition:
       background-color 0.2s ease,
       color 0.2s ease;
 
     &:hover,
     &:focus-visible {
-      background-color: #47374f;
+      background-color: #fee9d4;
     }
 
     &--active {
@@ -348,7 +403,7 @@ $tile-gap: 24px;
   gap: 6px;
   padding: 22px 26px;
   border: none;
-  border-radius: 16px;
+  border-radius: 16px 56px 16px 16px;
   background-color: #3b2e45;
   text-align: left;
   cursor: pointer;
@@ -491,7 +546,7 @@ $tile-gap: 24px;
     }
   }
 
-  .dropdown__icon {
-    max-width: 100%;
+  .dropdown__btn {
+    padding: 8px 16px;
   }
 }

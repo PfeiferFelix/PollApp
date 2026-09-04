@@ -6,12 +6,13 @@ import { Votes } from '../../services/votes';
 import { VotedSurveys } from '../../services/voted-surveys';
 import { isPastDay } from '../../services/dates';
 import { NewVote } from '../../services/service';
+import { Notice } from '../notice/notice';
 
 /**
  * Shows a single survey with its questions and answer options.
  */
 @Component({
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, Notice],
   selector: 'app-survey-view',
   styleUrl: './survey-view.scss',
   templateUrl: './survey-view.html',
@@ -35,6 +36,15 @@ export class SurveyView implements OnInit, OnDestroy {
 
   /** Controls the result panel on compact screens. */
   resultsOpen = signal(true);
+
+  /** True while the "already voted" reminder is sliding in. */
+  showVotedNotice = signal(false);
+
+  /** How long the "already voted" reminder stays before it hides itself. */
+  votedNoticeDuration = 3000;
+
+  /** Running timer that hides the "already voted" reminder again. */
+  private votedNoticeTimer?: ReturnType<typeof setTimeout>;
 
   /** Shows or hides the live result panel on compact screens. */
   toggleResults(): void {
@@ -76,6 +86,7 @@ export class SurveyView implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     clearTimeout(this.returnTimer);
+    clearTimeout(this.votedNoticeTimer);
   }
 
   /** The ids of all questions of this survey. */
@@ -151,8 +162,13 @@ export class SurveyView implements OnInit, OnDestroy {
    * @returns Promise that resolves once the save attempt is done.
    */
   async submit(): Promise<void> {
+    if (this.isClosed()) return;
+    if (this.hasVoted()) {
+      this.flashVotedNotice();
+      return;
+    }
     const rows = this.chosenRows();
-    if (!rows.length || this.isLocked()) return;
+    if (!rows.length) return;
     this.hasVoted.set(true);
     const ok = await this.votes.save(rows);
     if (!ok) return this.hasVoted.set(false);
@@ -160,6 +176,22 @@ export class SurveyView implements OnInit, OnDestroy {
     await this.votes.load(this.questionIds());
     this.selection.set({});
     this.scheduleReturn();
+  }
+
+  /** Briefly shows the reminder that this device already took part. */
+  flashVotedNotice(): void {
+    clearTimeout(this.votedNoticeTimer);
+    this.showVotedNotice.set(true);
+    this.votedNoticeTimer = setTimeout(
+      () => this.showVotedNotice.set(false),
+      this.votedNoticeDuration,
+    );
+  }
+
+  /** Hides the reminder right away, e.g. when its close button is pressed. */
+  closeVotedNotice(): void {
+    clearTimeout(this.votedNoticeTimer);
+    this.showVotedNotice.set(false);
   }
 
   /** Saved votes plus the own ticks that are not sent to the database yet. */

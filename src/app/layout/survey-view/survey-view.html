@@ -2,12 +2,12 @@
   <a class="page-header__link" routerLink="/home">
     <img class="page-header__logo" src="images/logo/logo_hover.png" alt="PollApp Logo" />
   </a>
-  <a class="page-header__create" routerLink="/create" aria-label="Create survey"></a>
+  <a class="page-header__create" routerLink="/create">Create survey</a>
 </header>
 
 <div class="content">
   <section class="survey">
-    <img class="survey__published" src="images/survey_Status/published.png" alt="Published" />
+    <span class="survey__published">Published</span>
 
     <div class="survey__meta">
       <span class="survey__ends">
@@ -25,8 +25,6 @@
 
     @if (isClosed()) {
       <p class="survey__notice">This survey has ended. You can only look at the results.</p>
-    } @else if (hasVoted()) {
-      <p class="survey__notice">You already took part in this survey. Thanks for voting!</p>
     }
 
     <div class="survey__questions">
@@ -66,7 +64,7 @@
     <button
       class="survey__submit"
       type="button"
-      [disabled]="isLocked() || !hasSelection()"
+      [disabled]="isClosed() || (!hasVoted() && !hasSelection())"
       (click)="submit()"
     >
       {{ submitLabel() }}
@@ -122,3 +120,7 @@
     </aside>
   }
 </div>
+
+@if (showVotedNotice()) {
+  <app-notice text="You already took part in this survey. Thanks for voting!" (closed)="closeVotedNotice()" />
+}

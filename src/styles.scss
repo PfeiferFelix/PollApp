@@ -7,9 +7,9 @@
 }
 
 @font-face {
-  font-family: 'Red Rose';
-  src: url('../Nerko_One,Red_Rose/Red_Rose/RedRose-VariableFont_wght.ttf') format('truetype');
-  font-weight: 300 700;
+  font-family: 'Mulish';
+  src: url('../public/fonts/Mulish-VariableFont_wght.ttf') format('truetype');
+  font-weight: 200 1000;
   font-style: normal;
   font-display: swap;
 }
@@ -22,7 +22,7 @@
 body {
   margin: 0;
   background-color: var(--page-bg);
-  font-family: 'Red Rose', Arial, sans-serif;
+  font-family: 'Mulish', Arial, sans-serif;
 }
 
 *,

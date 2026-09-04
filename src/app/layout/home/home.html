@@ -13,7 +13,15 @@
       and turn feedback into action.
     </p>
 
-    <button type="button" class="hero__cta" routerLink="/create" aria-label="New survey"></button>
+    <button type="button" class="hero__cta" routerLink="/create">
+      New survey
+      <span class="hero__cta-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6" />
+          <path d="M12 7V17M7 12H17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </span>
+    </button>
   </div>
 
   <div class="hero__phone" aria-hidden="true"></div>
@@ -70,47 +78,53 @@
     </div>
 
     <div class="dropdown">
-      <button
-        type="button"
-        class="dropdown__btn"
-        aria-haspopup="menu"
-        [attr.aria-expanded]="dropdownOpen()"
-        aria-label="Sort by categories"
-        (click)="toggleDropdown()"
-      >
-        <img class="dropdown__icon" src="images/dropdown_menu/dorpdown_menu.png" alt="" />
-      </button>
+      <div class="dropdown__shell" [class.dropdown__shell--open]="dropdownOpen()">
+        <button
+          type="button"
+          class="dropdown__btn"
+          aria-haspopup="menu"
+          [attr.aria-expanded]="dropdownOpen()"
+          (click)="toggleDropdown()"
+        >
+          {{ category() ?? 'Sort by categories' }}
+          <span
+            class="dropdown__arrow"
+            [class.dropdown__arrow--open]="dropdownOpen()"
+            aria-hidden="true"
+          ></span>
+        </button>
 
-      @if (dropdownOpen()) {
-        <ul class="dropdown__list" role="menu" aria-label="Categories">
-          <li>
-            <button
-              type="button"
-              role="menuitemradio"
-              class="dropdown__item"
-              [class.dropdown__item--active]="category() === null"
-              [attr.aria-checked]="category() === null"
-              (click)="selectCategory(null)"
-            >
-              All categories
-            </button>
-          </li>
-          @for (cat of categories(); track cat) {
+        @if (dropdownOpen()) {
+          <ul class="dropdown__list" role="menu" aria-label="Categories">
             <li>
               <button
                 type="button"
                 role="menuitemradio"
                 class="dropdown__item"
-                [class.dropdown__item--active]="category() === cat"
-                [attr.aria-checked]="category() === cat"
-                (click)="selectCategory(cat)"
+                [class.dropdown__item--active]="category() === null"
+                [attr.aria-checked]="category() === null"
+                (click)="selectCategory(null)"
               >
-                {{ cat }}
+                All Surveys
               </button>
             </li>
-          }
-        </ul>
-      }
+            @for (cat of categories(); track cat) {
+              <li>
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  class="dropdown__item"
+                  [class.dropdown__item--active]="category() === cat"
+                  [attr.aria-checked]="category() === cat"
+                  (click)="selectCategory(cat)"
+                >
+                  {{ cat }}
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
     </div>
   </div>
 

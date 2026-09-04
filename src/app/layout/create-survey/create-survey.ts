@@ -35,6 +35,9 @@ export class CreateSurvey {
   /** True once the survey is saved and the success message is showing. */
   published = signal(false);
 
+  /** Id of the survey that was just created, used to jump to it after publishing. */
+  createdSurveyId = signal<number | null>(null);
+
   /** How long the success message stays before going back to the home page. */
   noticeDuration = 2500;
 
@@ -228,15 +231,17 @@ export class CreateSurvey {
       return;
     }
     this.fieldErrors.set({});
-    const ok = await this.surveys.create(this.buildSurvey());
-    if (!ok) return;
+    const id = await this.surveys.create(this.buildSurvey());
+    if (id === null) return;
+    this.createdSurveyId.set(id);
     this.published.set(true);
-    setTimeout(() => this.goHome(), this.noticeDuration);
+    setTimeout(() => this.goToCreatedSurvey(), this.noticeDuration);
   }
 
-  /** Closes the message and goes back to the home page. */
-  goHome(): void {
-    this.router.navigate(['/home']);
+  /** Closes the message and jumps to the survey that was just created. */
+  goToCreatedSurvey(): void {
+    const id = this.createdSurveyId();
+    this.router.navigate(id === null ? ['/home'] : ['/survey', id]);
   }
 
   /**

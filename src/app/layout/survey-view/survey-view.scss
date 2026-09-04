@@ -1,4 +1,4 @@
-$font-body: 'Red Rose', Arial, sans-serif;
+$font-body: 'Mulish', Arial, sans-serif;
 
 :host {
   display: block;
@@ -32,21 +32,33 @@ $font-body: 'Red Rose', Arial, sans-serif;
   }
 
   &__create {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 auto;
-    width: 157px;
+    min-width: 157px;
     height: 48px;
+    padding: 0 26px;
     border: none;
+    border-radius: 999px;
     cursor: pointer;
-    background: url('../../../../public/images/create_survey_button.png') no-repeat center / contain;
+    background-color: #ffb770;
+    font-family: 'Nokora', $font-body;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #221227;
+    text-decoration: none;
     transition:
+      background-color 0.2s ease,
       transform 0.2s ease,
-      filter 0.2s ease;
+      box-shadow 0.2s ease;
 
     &:hover,
     &:focus-visible {
+      background-color: #ffcfa1;
       transform: translateY(-2px);
-      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
     }
 
     &:active {
@@ -71,9 +83,18 @@ $font-body: 'Red Rose', Arial, sans-serif;
   color: #34273b;
 
   &__published {
-    display: block;
+    display: inline-flex;
+    align-items: center;
     height: 28px;
-    width: auto;
+    padding: 0 16px;
+    border-radius: 6px;
+    background-color: #ffb770;
+    font-family: $font-body;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    color: #221227;
+    white-space: nowrap;
   }
 
   &__meta {
