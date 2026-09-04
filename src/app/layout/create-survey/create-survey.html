@@ -21,10 +21,14 @@
                 id="survey_name"
                 type="text"
                 [value]="title()"
-                (input)="title.set(readValue($event))"
+                [attr.aria-invalid]="fieldError('title') ? 'true' : null"
+                (input)="onTitleInput($event)"
               />
               <button class="clear-btn" type="button" aria-label="Clear survey name"></button>
             </div>
+            @if (fieldError('title'); as error) {
+              <p class="field__error">{{ error }}</p>
+            }
           </div>
 
           <div class="field-line">
@@ -38,6 +42,8 @@
                   id="survey_end_date"
                   type="date"
                   [value]="endDate()"
+                  [min]="minDate"
+                  [attr.aria-invalid]="fieldError('endDate') ? 'true' : null"
                   (input)="onEndDateInput($event)"
                 />
                 @if (endDate()) {
@@ -49,19 +55,24 @@
                   ></button>
                 }
               </div>
+              @if (fieldError('endDate'); as error) {
+                <p class="field__error">{{ error }}</p>
+              }
             </div>
 
-            <div class="dropdown">
-              <button
-                class="category-btn"
-                type="button"
-                aria-haspopup="menu"
-                [attr.aria-expanded]="categoryOpen()"
-                (click)="toggleCategory()"
-              >
-                {{ category() ?? 'Choose category' }}
-                <span class="category-btn__arrow" aria-hidden="true"></span>
-              </button>
+            <div class="field field--category">
+              <div class="dropdown">
+                <button
+                  class="category-btn"
+                  type="button"
+                  aria-haspopup="menu"
+                  [attr.aria-expanded]="categoryOpen()"
+                  [attr.aria-invalid]="fieldError('category') ? 'true' : null"
+                  (click)="toggleCategory()"
+                >
+                  {{ category() ?? 'Choose category' }}
+                  <span class="category-btn__arrow" aria-hidden="true"></span>
+                </button>
 
               @if (categoryOpen()) {
                 <ul class="dropdown__list" role="menu" aria-label="Categories">
@@ -80,6 +91,10 @@
                     </li>
                   }
                 </ul>
+              }
+              </div>
+              @if (fieldError('category'); as error) {
+                <p class="field__error">{{ error }}</p>
               }
             </div>
           </div>
@@ -113,15 +128,21 @@
               ></button>
             </div>
 
-            <div class="field-row">
-              <input
-                class="input"
-                [attr.id]="'question_' + qi"
-                type="text"
-                placeholder="Which date would work best for you?"
-                [value]="question.text()"
-                (input)="question.text.set(readValue($event))"
-              />
+            <div class="question__field">
+              <div class="field-row">
+                <input
+                  class="input"
+                  [attr.id]="'question_' + qi"
+                  type="text"
+                  placeholder="Which date would work best for you?"
+                  [value]="question.text()"
+                  [attr.aria-invalid]="fieldError('question-' + question.id) ? 'true' : null"
+                  (input)="onQuestionInput(question, $event)"
+                />
+              </div>
+              @if (fieldError('question-' + question.id); as error) {
+                <p class="field__error">{{ error }}</p>
+              }
             </div>
 
             <div class="answers">
@@ -140,24 +161,30 @@
                 </label>
               </div>
 
-              @for (answer of question.answers(); track answer.id) {
-                <div class="answer">
-                  <span class="answer__letter" aria-hidden="true">{{ letters[$index] }}.</span>
-                  <input
-                    class="input"
-                    type="text"
-                    [value]="answer.text"
-                    (input)="onAnswerInput(question, answer.id, $event)"
-                    [attr.aria-label]="'Answer ' + letters[$index]"
-                  />
-                  <button
-                    (click)="removeAnswer(question, answer.id)"
-                    class="clear-btn"
-                    type="button"
-                    [attr.aria-label]="'Delete answer ' + letters[$index]"
-                  ></button>
-                </div>
-              }
+              <div class="answers__list">
+                @for (answer of question.answers(); track answer.id) {
+                  <div class="answer">
+                    <span class="answer__letter" aria-hidden="true">{{ letters[$index] }}.</span>
+                    <input
+                      class="input"
+                      type="text"
+                      [value]="answer.text"
+                      (input)="onAnswerInput(question, answer.id, $event)"
+                      [attr.aria-label]="'Answer ' + letters[$index]"
+                    />
+                    <button
+                      (click)="removeAnswer(question, answer.id)"
+                      class="clear-btn"
+                      type="button"
+                      [attr.aria-label]="'Delete answer ' + letters[$index]"
+                    ></button>
+                  </div>
+                }
+
+                @if (fieldError('answers-' + question.id); as error) {
+                  <p class="field__error">{{ error }}</p>
+                }
+              </div>
 
               @if (question.answers().length < letters.length) {
                 <button
@@ -182,9 +209,6 @@
       </div>
     </section>
 
-    @if (formError()) {
-      <p class="create__error">{{ formError() }}</p>
-    }
     @if (surveys.errorMessage()) {
       <p class="create__error">{{ surveys.errorMessage() }}</p>
     }
