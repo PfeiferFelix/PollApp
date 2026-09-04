@@ -1,7 +1,15 @@
 @font-face {
   font-family: 'Nerko One';
-  src: url('/fonts/NerkoOne-Regular.ttf') format('truetype');
+  src: url('../public/fonts/NerkoOne-Regular.ttf') format('truetype');
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Red Rose';
+  src: url('../Nerko_One,Red_Rose/Red_Rose/RedRose-VariableFont_wght.ttf') format('truetype');
+  font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
@@ -11,25 +19,21 @@
   --content-max-width: 1440px;
 }
 
-@media (min-width: 1600px) {
-  :root {
-    --content-max-width: 1920px;
-  }
-}
-
-@media (min-width: 2200px) {
-  :root {
-    --content-max-width: 2240px;
-  }
-}
-
 body {
   margin: 0;
   background-color: var(--page-bg);
+  font-family: 'Red Rose', Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 app-root {
   display: block;
+  width: 100%;
   max-width: var(--content-max-width);
   margin-inline: auto;
 }
