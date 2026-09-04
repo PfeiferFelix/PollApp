@@ -1,5 +1,28 @@
 $font-body: 'Red Rose', Arial, sans-serif;
 
+%icon-btn {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: no-repeat center / contain;
+}
+
+%lift {
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
 :host {
   box-sizing: border-box;
   display: grid;
@@ -29,27 +52,13 @@ $font-body: 'Red Rose', Arial, sans-serif;
   }
 
   &__publish {
+    @extend %icon-btn;
+    @extend %lift;
     display: block;
     width: 204px;
     height: 40px;
     margin: 24px 0 0 auto;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    background: url('../../../../public/images/publish_button.png') no-repeat center / contain;
-    transition:
-      transform 0.2s ease,
-      filter 0.2s ease;
-
-    &:hover,
-    &:focus-visible {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
+    background-image: url('../../../../public/images/publish_button.png');
 
     &:disabled {
       cursor: default;
@@ -86,22 +95,10 @@ $font-body: 'Red Rose', Arial, sans-serif;
   }
 
   &__cancel {
+    @extend %lift;
     grid-area: 2 / 2;
     display: inline-flex;
     cursor: pointer;
-    transition:
-      transform 0.2s ease,
-      filter 0.2s ease;
-
-    &:hover,
-    &:focus-visible {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
   }
 
   &__cancel-icon {
@@ -131,27 +128,13 @@ $font-body: 'Red Rose', Arial, sans-serif;
   }
 
   &__add-question {
+    @extend %icon-btn;
+    @extend %lift;
     justify-self: start;
     align-self: start;
     width: 204px;
     height: 40px;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    background: url('../../../../public/images/Add_next_questioin.png') no-repeat center / contain;
-    transition:
-      transform 0.2s ease,
-      filter 0.2s ease;
-
-    &:hover,
-    &:focus-visible {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-    }
-
-    &:active {
-      transform: scale(0.97);
-    }
+    background-image: url('../../../../public/images/Add_next_questioin.png');
   }
 }
 
@@ -251,13 +234,11 @@ $font-body: 'Red Rose', Arial, sans-serif;
 }
 
 .clear-btn {
+  @extend %icon-btn;
   flex: 0 0 auto;
   width: 26px;
   height: 26px;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  background: url('../../../../public/images/delete/delete.png') no-repeat center / contain;
+  background-image: url('../../../../public/images/delete/delete.png');
   transition: transform 0.2s ease;
 
   &:hover,
@@ -392,15 +373,13 @@ $font-body: 'Red Rose', Arial, sans-serif;
   }
 
   &__add {
+    @extend %icon-btn;
     justify-self: start;
     width: 146px;
     height: 40px;
     margin-top: 5px;
     margin-left: 20px;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    background: url('../../../../public/images/tertiary/add_answer.png') no-repeat center / contain;
+    background-image: url('../../../../public/images/tertiary/add_answer.png');
     transition: transform 0.2s ease;
 
     &:hover,
