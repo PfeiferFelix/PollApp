@@ -1,6 +1,7 @@
 import { Component, signal, inject, WritableSignal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Surveys } from '../../services/surveys';
+import { todayIso } from '../../services/dates';
 import { NewQuestion, NewSurvey } from '../../services/service';
 
 interface Question {
@@ -9,6 +10,8 @@ interface Question {
   allowMultiple: WritableSignal<boolean>;
   answers: WritableSignal<{ id: number; text: string }[]>;
 }
+
+type FieldErrors = Record<string, string>;
 
 /**
  * Form for creating a new survey.
@@ -25,8 +28,8 @@ export class CreateSurvey {
   surveys = inject(Surveys);
   router = inject(Router);
 
-  /** Which entry is still missing in the form. Null when everything is fine. */
-  formError = signal<string | null>(null);
+  /** Validation messages keyed by the input or answer group they belong to. */
+  fieldErrors = signal<FieldErrors>({});
 
   /** True once the survey is saved and the success message is showing. */
   published = signal(false);
@@ -45,6 +48,9 @@ export class CreateSurvey {
 
   /** End date of the survey. */
   endDate = signal('');
+
+  /** Earliest date the survey may end on, so the past stays unreachable. */
+  minDate = todayIso();
 
   /** Selectable categories. */
   categories = ['Sport', 'Health', 'Gaming', 'Vacation', 'Food', 'Artist'];
@@ -82,6 +88,7 @@ export class CreateSurvey {
   selectCategory(cat: string): void {
     this.category.set(cat);
     this.categoryOpen.set(false);
+    this.clearFieldError('category');
   }
 
   /**
@@ -147,6 +154,7 @@ export class CreateSurvey {
     question.answers.update((list) =>
       list.map((answer) => (answer.id === id ? { ...answer, text } : answer)),
     );
+    this.clearFieldError(`answers-${question.id}`);
   }
 
   /**
@@ -155,11 +163,13 @@ export class CreateSurvey {
    */
   onEndDateInput(event: Event): void {
     this.endDate.set((event.target as HTMLInputElement).value);
+    this.clearFieldError('endDate');
   }
 
   /** Clears the end date field. */
   deleteEndDateInput(): void {
     this.endDate.set('');
+    this.clearFieldError('endDate');
   }
 
   /**
@@ -169,6 +179,32 @@ export class CreateSurvey {
    */
   readValue(event: Event): string {
     return (event.target as HTMLInputElement | HTMLTextAreaElement).value;
+  }
+
+  /** Updates the survey name and clears its validation message. */
+  onTitleInput(event: Event): void {
+    this.title.set(this.readValue(event));
+    this.clearFieldError('title');
+  }
+
+  /** Updates one question and clears its validation message. */
+  onQuestionInput(question: Question, event: Event): void {
+    question.text.set(this.readValue(event));
+    this.clearFieldError(`question-${question.id}`);
+  }
+
+  /** Returns the message belonging to an individual field, if it has one. */
+  fieldError(key: string): string | null {
+    return this.fieldErrors()[key] ?? null;
+  }
+
+  /** Removes an error as soon as the user updates its related field. */
+  clearFieldError(key: string): void {
+    this.fieldErrors.update((errors) => {
+      if (!errors[key]) return errors;
+      const { [key]: _removed, ...remaining } = errors;
+      return remaining;
+    });
   }
 
   /**
@@ -185,12 +221,12 @@ export class CreateSurvey {
    * @returns Promise that resolves once the save attempt is done.
    */
   async publish(): Promise<void> {
-    const error = this.validate();
-    if (error) {
-      this.formError.set(error);
+    const errors = this.validate();
+    if (Object.keys(errors).length) {
+      this.fieldErrors.set(errors);
       return;
     }
-    this.formError.set(null);
+    this.fieldErrors.set({});
     const ok = await this.surveys.create(this.buildSurvey());
     if (!ok) return;
     this.published.set(true);
@@ -216,27 +252,34 @@ export class CreateSurvey {
 
   /**
    * Checks whether all required entries are filled in.
-   * @returns Hint about the first missing entry, or null when everything is fine.
+   * @returns All missing required entries, keyed by their matching field.
    */
-  validate(): string | null {
-    if (!this.title().trim()) return 'Bitte gib der Umfrage einen Namen.';
-    if (!this.category()) return 'Bitte waehle eine Kategorie.';
-    return this.validateQuestions();
+  validate(): FieldErrors {
+    const errors: FieldErrors = {};
+    if (!this.title().trim()) errors['title'] = 'Please give the survey a name.';
+    if (!this.category()) errors['category'] = 'Please choose a category.';
+    if (this.endDate() && this.endDate() < this.minDate) {
+      errors['endDate'] = 'The end date must not be in the past.';
+    }
+    return { ...errors, ...this.validateQuestions() };
   }
 
   /**
    * Checks every question for its text and for enough filled in answers.
-   * @returns Hint about the first incomplete question, or null when all of them pass.
+   * @returns Every incomplete question and answer group, keyed by their field.
    */
-  validateQuestions(): string | null {
+  validateQuestions(): FieldErrors {
+    const errors: FieldErrors = {};
     for (const [index, question] of this.questions().entries()) {
       const nr = index + 1;
-      if (!question.text().trim()) return `Bitte formuliere Frage ${nr}.`;
+      if (!question.text().trim()) {
+        errors[`question-${question.id}`] = `Please write question ${nr}.`;
+      }
       if (this.filledOptions(question).length < this.minAnswers) {
-        return `Bitte fuelle zwei Antworten bei Frage ${nr} aus.`;
+        errors[`answers-${question.id}`] = `Please fill in two answers for question ${nr}.`;
       }
     }
-    return null;
+    return errors;
   }
 
   /**
