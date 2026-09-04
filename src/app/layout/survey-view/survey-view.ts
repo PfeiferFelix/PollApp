@@ -3,6 +3,8 @@ import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Surveys } from '../../services/surveys';
 import { Votes } from '../../services/votes';
+import { VotedSurveys } from '../../services/voted-surveys';
+import { isPastDay } from '../../services/dates';
 import { NewVote } from '../../services/service';
 
 /**
@@ -19,6 +21,7 @@ export class SurveyView implements OnInit, OnDestroy {
 
   surveys = inject(Surveys);
   votes = inject(Votes);
+  votedSurveys = inject(VotedSurveys);
   router = inject(Router);
 
   /** Letters in front of the answers, in the order of the options. */
@@ -30,6 +33,14 @@ export class SurveyView implements OnInit, OnDestroy {
   /** True once a vote has been cast in this session. */
   hasVoted = signal(false);
 
+  /** Controls the result panel on compact screens. */
+  resultsOpen = signal(true);
+
+  /** Shows or hides the live result panel on compact screens. */
+  toggleResults(): void {
+    this.resultsOpen.update((open) => !open);
+  }
+
   /** Running timer that brings the user back to the home page after voting. */
   private returnTimer?: ReturnType<typeof setTimeout>;
 
@@ -38,13 +49,26 @@ export class SurveyView implements OnInit, OnDestroy {
     Object.values(this.selection()).some((indexes) => indexes.length > 0),
   );
 
+  /** True when the end date of the survey is already over. */
+  isClosed = computed(() => isPastDay(this.survey()?.ends_at));
+
+  /** True when no further answers may be given. */
+  isLocked = computed(() => this.hasVoted() || this.isClosed());
+
+  /** Caption of the submit button for the current state. */
+  submitLabel = computed(() => {
+    if (this.isClosed()) return 'Survey has ended';
+    return this.hasVoted() ? 'Thanks for voting' : 'Complete survey';
+  });
+
   /**
-   * Loads the survey and afterwards the votes that were already cast.
+   * Loads the survey, its votes and whether this device voted already.
    * @returns Promise that resolves once both requests are done.
    */
   async ngOnInit(): Promise<void> {
     await this.surveys.load();
     await this.votes.load(this.questionIds());
+    if (this.votedSurveys.has(Number(this.id()))) this.hasVoted.set(true);
   }
 
   /**
@@ -101,6 +125,7 @@ export class SurveyView implements OnInit, OnDestroy {
    * @param index Number of the clicked answer.
    */
   toggle(questionId: number, multiple: boolean, index: number): void {
+    if (this.isLocked()) return;
     const chosen = this.selection()[questionId] ?? [];
     let next = [index];
     if (multiple) {
@@ -127,13 +152,24 @@ export class SurveyView implements OnInit, OnDestroy {
    */
   async submit(): Promise<void> {
     const rows = this.chosenRows();
-    if (!rows.length || this.hasVoted()) return;
+    if (!rows.length || this.isLocked()) return;
     this.hasVoted.set(true);
     const ok = await this.votes.save(rows);
     if (!ok) return this.hasVoted.set(false);
+    this.votedSurveys.add(Number(this.id()));
     await this.votes.load(this.questionIds());
+    this.selection.set({});
     this.scheduleReturn();
   }
+
+  /** Saved votes plus the own ticks that are not sent to the database yet. */
+  previewVotes = computed<NewVote[]>(() => {
+    const saved = this.votes.votelist().map((vote) => ({
+      question_id: vote.question_id,
+      option_index: vote.option_index,
+    }));
+    return [...saved, ...this.chosenRows()];
+  });
 
   /**
    * How many percent of the votes of a question go to one answer.
@@ -142,7 +178,7 @@ export class SurveyView implements OnInit, OnDestroy {
    * @returns Share in percent, rounded. Without votes 0.
    */
   percent(questionId: number, index: number): number {
-    const votes = this.votes.votelist().filter((v) => v.question_id === questionId);
+    const votes = this.previewVotes().filter((v) => v.question_id === questionId);
     if (!votes.length) return 0;
 
     const hits = votes.filter((v) => v.option_index === index).length;
