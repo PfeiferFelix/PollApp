@@ -222,21 +222,6 @@
   </div>
 
   @if (published()) {
-    <div class="notice" role="status" aria-live="polite">
-      <p class="notice__text">Your survey is now published</p>
-      <button class="notice__close" type="button" aria-label="Close message" (click)="goHome()">
-        <svg
-          class="notice__icon"
-          viewBox="0 0 20 20"
-          aria-hidden="true"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-        >
-          <path d="M4 4 L16 16 M16 4 L4 16" />
-        </svg>
-      </button>
-    </div>
+    <app-notice text="Your survey is now published" (closed)="goHome()" />
   }
 </section>
