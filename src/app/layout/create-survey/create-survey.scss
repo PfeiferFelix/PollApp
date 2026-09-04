@@ -7,6 +7,13 @@ $font-body: 'Red Rose', Arial, sans-serif;
   background: no-repeat center / contain;
 }
 
+%label-text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
 %lift {
   transition:
     transform 0.2s ease,
@@ -186,10 +193,7 @@ $font-body: 'Red Rose', Arial, sans-serif;
 }
 
 .label {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #ffffff;
+  @extend %label-text;
 
   &__hint {
     font-size: 15px;
@@ -215,11 +219,7 @@ $font-body: 'Red Rose', Arial, sans-serif;
     color: #34273b;
   }
 
-  &:focus-visible {
-    outline: 2px solid #ffb770;
-    outline-offset: 2px;
-  }
-
+  &:focus-visible,
   &[aria-invalid='true'] {
     outline: 2px solid #ffb770;
     outline-offset: 2px;
@@ -253,6 +253,7 @@ $font-body: 'Red Rose', Arial, sans-serif;
 }
 
 .category-btn {
+  @extend %label-text;
   display: inline-flex;
   align-items: center;
   gap: 18px;
@@ -262,10 +263,6 @@ $font-body: 'Red Rose', Arial, sans-serif;
   background: none;
   cursor: pointer;
   font-family: inherit;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #ffffff;
   transition: color 0.2s ease;
 
   &__arrow {
@@ -400,12 +397,10 @@ $font-body: 'Red Rose', Arial, sans-serif;
   gap: 12px;
 
   &__letter {
+    @extend %label-text;
     flex: 0 0 auto;
     min-width: 20px;
     font-size: 18px;
-    font-weight: 700;
-    line-height: 1.2;
-    color: #ffffff;
   }
 }
 
@@ -457,75 +452,6 @@ $font-body: 'Red Rose', Arial, sans-serif;
   &:hover &__box {
     border-color: #ffcfa1;
     background-color: #fee9d4;
-  }
-}
-
-.notice {
-  position: fixed;
-  right: 0;
-  bottom: 48px;
-  z-index: 50;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  max-width: 250px;
-  padding: 12px 14px;
-  border-radius: 12px 12px 36px 12px;
-  background-color: #fee9d4;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
-  animation: notice-slide-in 0.4s ease-out both;
-
-  &__text {
-    margin: 0;
-    font-family: 'Nerko One', cursive;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.2;
-    color: #34273b;
-  }
-
-  &__close {
-    flex: 0 0 auto;
-    display: inline-flex;
-    margin-top: 1px;
-    border: none;
-    padding: 2px;
-    background: none;
-    cursor: pointer;
-    color: #34273b;
-    transition: transform 0.2s ease;
-
-    &:hover,
-    &:focus-visible {
-      transform: scale(1.12);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-  }
-
-  &__icon {
-    display: block;
-    height: 13px;
-    width: 13px;
-  }
-}
-
-@keyframes notice-slide-in {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .notice {
-    animation: none;
   }
 }
 
@@ -623,17 +549,5 @@ $font-body: 'Red Rose', Arial, sans-serif;
 
   .answer {
     min-width: 0;
-  }
-
-  .notice {
-    left: 16px;
-    right: 16px;
-    bottom: 24px;
-    max-width: none;
-    padding: 12px 14px;
-
-    &__text {
-      font-size: 15px;
-    }
   }
 }
