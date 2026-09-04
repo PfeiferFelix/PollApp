@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Surveys } from '../../services/surveys';
 import { todayIso } from '../../services/dates';
 import { NewQuestion, NewSurvey } from '../../services/service';
+import { Notice } from '../notice/notice';
 
 interface Question {
   id: number;
@@ -17,7 +18,7 @@ type FieldErrors = Record<string, string>;
  * Form for creating a new survey.
  */
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, Notice],
   selector: 'app-create-survey',
   styleUrl: './create-survey.scss',
   templateUrl: './create-survey.html',
