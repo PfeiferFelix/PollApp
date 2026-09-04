@@ -1,4 +1,4 @@
-$font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+$font-body: 'Red Rose', Arial, sans-serif;
 
 :host {
   box-sizing: border-box;
@@ -36,7 +36,7 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     border: none;
     padding: 0;
     cursor: pointer;
-    background: url('/images/publish_button.png') no-repeat center / contain;
+    background: url('../../../../public/images/publish_button.png') no-repeat center / contain;
     transition:
       transform 0.2s ease,
       filter 0.2s ease;
@@ -62,7 +62,7 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 
 .card-header {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px 40px;
 
@@ -81,6 +81,8 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 400;
     line-height: 1.1;
     color: #ffb770;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   &__cancel {
@@ -136,7 +138,7 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     border: none;
     padding: 0;
     cursor: pointer;
-    background: url('/images/Add_next_questioin.png') no-repeat center / contain;
+    background: url('../../../../public/images/Add_next_questioin.png') no-repeat center / contain;
     transition:
       transform 0.2s ease,
       filter 0.2s ease;
@@ -154,6 +156,7 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .field {
+  position: relative;
   display: grid;
   gap: 10px;
 
@@ -163,6 +166,23 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     .label {
       white-space: nowrap;
     }
+  }
+
+  &--category {
+    align-content: start;
+  }
+
+  &__error {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 1;
+    margin: 0;
+    font-family: $font-body;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: #ffb770;
   }
 }
 
@@ -217,6 +237,11 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     outline-offset: 2px;
   }
 
+  &[aria-invalid='true'] {
+    outline: 2px solid #ffb770;
+    outline-offset: 2px;
+  }
+
   &--area {
     padding: 12px 18px;
     border-radius: 8px;
@@ -232,12 +257,12 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
   border: none;
   padding: 0;
   cursor: pointer;
-  background: url('/images/delete/delete.png') no-repeat center / contain;
+  background: url('../../../../public/images/delete/delete.png') no-repeat center / contain;
   transition: transform 0.2s ease;
 
   &:hover,
   &:focus-visible {
-    background-image: url('/images/delete/delete_hover.png');
+    background-image: url('../../../../public/images/delete/delete_hover.png');
     transform: translateY(-1px);
   }
 
@@ -340,6 +365,10 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     justify-content: space-between;
     gap: 12px;
   }
+
+  &__field {
+    position: relative;
+  }
 }
 
 .answers {
@@ -356,6 +385,12 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     padding-right: 38px;
   }
 
+  &__list {
+    position: relative;
+    display: grid;
+    gap: 13px;
+  }
+
   &__add {
     justify-self: start;
     width: 146px;
@@ -365,12 +400,12 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     border: none;
     padding: 0;
     cursor: pointer;
-    background: url('/images/tertiary/add_answer.png') no-repeat center / contain;
+    background: url('../../../../public/images/tertiary/add_answer.png') no-repeat center / contain;
     transition: transform 0.2s ease;
 
     &:hover,
     &:focus-visible {
-      background-image: url('/images/tertiary/add_answer_hover.png');
+      background-image: url('../../../../public/images/tertiary/add_answer_hover.png');
       transform: translateY(-1px);
     }
 
@@ -423,7 +458,7 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     &:checked + .checkbox__box {
       border-color: #ffb770;
       background-color: #ffb770;
-      background-image: url('/images/checkbox/checkbox_checked.png');
+      background-image: url('../../../../public/images/checkbox/checkbox_checked.png');
     }
   }
 
@@ -521,6 +556,8 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
   }
 
   .create {
+    min-width: 0;
+
     &__card {
       min-height: 0;
       padding: 20px;
@@ -556,14 +593,28 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     border-radius: 5px 56px 5px 5px;
 
     &__grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       gap: 24px;
     }
+
+    &__column {
+      min-width: 0;
+    }
+  }
+
+  .field,
+  .question,
+  .answers {
+    min-width: 0;
   }
 
   .field-line {
     flex-direction: column;
     gap: 16px;
+  }
+
+  .field-row {
+    min-width: 0;
   }
 
   .field--date {
@@ -573,6 +624,26 @@ $font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
 
   .label {
     font-size: 17px;
+  }
+
+  .answers__head {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-right: 0;
+  }
+
+  .checkbox {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .checkbox__text {
+    overflow-wrap: anywhere;
+  }
+
+  .answer {
+    min-width: 0;
   }
 
   .notice {
